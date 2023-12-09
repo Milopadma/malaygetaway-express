@@ -13,13 +13,13 @@ if (!db) {
   process.exit(1);
 }
 mongoose
-  .connect(db)
-  .then(() => console.log("MongoDB connected successfully"))
-  .catch((err) => console.error("MongoDB connection error:", err));
-
-mongoose.connection.on("error", (err) => {
-  console.error(`MongoDB connection error: ${err}`);
-});
+  .connect("" + process.env.MONGODB_URI, { connectTimeoutMS: 1000 })
+  .then(() => {
+    console.log("MongoDB connected");
+  })
+  .catch((err) => {
+    console.error(`MongoDB connection error: ${err}`);
+  });
 
 // schema def
 const merchantSchema = new mongoose.Schema({
