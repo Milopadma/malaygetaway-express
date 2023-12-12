@@ -6,6 +6,7 @@ import { Resend } from "resend";
 import { UTApi } from "uploadthing/server";
 import multer from "multer";
 import fs from "fs";
+import { constants } from "fs";
 
 // setup
 const app = express();
@@ -36,6 +37,8 @@ if (!process.env.UPLOADTHING_SECRET) {
 if (utapi) {
   console.log("UTApi connected");
 }
+
+const upload = multer();
 
 // schema def
 const merchantSchema = new mongoose.Schema({
@@ -101,36 +104,32 @@ app.post("/merchant/register", (req: Request, res: Response) => {
 });
 
 // send files endpoint
-const upload = multer();
-
 app.post("/sendFiles", upload.array("files"), async (req, res) => {
   if (!req.files) {
     return res.status(400).json({ message: "No files uploaded" });
   }
 
-  const files = Array.from(Object.values(req.files)); // Convert files to an array
+  console.log("1. Received files from FE", req.files);
+  const files = req.files as Express.Multer.File[];
 
   // save these files to the uploads folder
-  files.forEach((file) => {
-    const filePath = `./uploads/${file.originalname}`;
-    fs.writeFile(filePath, file.buffer, (err) => {
-      if (err) throw err;
-      console.log("File saved!");
-    });
-  });
-
-  // check if files exist
-  const fileExists = fs.existsSync("./uploads");
-  console.log(fileExists);
+  await saveFiles(files);
 
   // then send files to uploadthing
-  if (!fileExists) {
+  if (await checkFiles(files)) {
     return res.status(400).json({ message: "No files uploaded" });
   } else {
     const formData = new FormData();
     files.forEach((file) => {
-      formData.append("files", file);
+      const filePath = `./uploads/${file.originalname}`;
+      fs.readFile(filePath, (err, data) => {
+        if (err) throw err;
+        const blob = new Blob([data], { type: file.mimetype });
+        formData.append("files", blob, file.originalname);
+      });
     });
+
+    console.log("4. Form data to send: ", formData);
 
     try {
       const response = await sendFiles(formData);
@@ -169,7 +168,32 @@ function sendEmail() {
 
 async function sendFiles(formData: FormData) {
   const files = formData.getAll("files");
-  console.log(files);
+  console.log("5. Sending...", files);
   const response = await utapi.uploadFiles(files);
   console.log(response);
+}
+
+// check if files exist by filename
+async function checkFiles(files: Express.Multer.File[]): Promise<boolean> {
+  console.log("3. Checking files...");
+  for (const file of files) {
+    const filePath = `./uploads/${file.originalname}`;
+    const stats = fs.statSync(filePath);
+    if (!stats.isFile()) {
+      console.error(`${filePath} is not a complete file.`);
+      return false;
+    }
+  }
+  return true;
+}
+
+async function saveFiles(files: Express.Multer.File[]): Promise<void> {
+  console.log("2. Saving files...");
+  await files.forEach((file) => {
+    const filePath = `./uploads/${file.originalname}`;
+    fs.writeFile(filePath, file.buffer, (err) => {
+      if (err) throw err;
+      console.log("File saved in server!");
+    });
+  });
 }
