@@ -7,6 +7,11 @@ import { UTApi } from "uploadthing/server";
 import multer from "multer";
 import fs from "fs";
 import { constants } from "fs";
+import { UploadFileResponse } from "uploadthing/client";
+
+interface FileEsque extends Blob {
+  name: string;
+}
 
 // setup
 const app = express();
@@ -113,26 +118,13 @@ app.post("/sendFiles", upload.array("files"), async (req, res) => {
   const files = req.files as Express.Multer.File[];
 
   // save these files to the uploads folder
-  await saveFiles(files);
-
   // then send files to uploadthing
-  if (await checkFiles(files)) {
+  if (!(await saveFiles(files))) {
     return res.status(400).json({ message: "No files uploaded" });
   } else {
-    const formData = new FormData();
-    files.forEach((file) => {
-      const filePath = `./uploads/${file.originalname}`;
-      fs.readFile(filePath, (err, data) => {
-        if (err) throw err;
-        const blob = new Blob([data], { type: file.mimetype });
-        formData.append("files", blob, file.originalname);
-      });
-    });
-
-    console.log("4. Form data to send: ", formData);
-
     try {
-      const response = await sendFiles(formData);
+      const filePaths = files.map((file) => `./uploads/${file.originalname}`);
+      const response = await sendFiles(filePaths);
       res.json({ message: "sendFiles: Data Received", response });
     } catch (error) {
       console.error(error);
@@ -166,34 +158,52 @@ function sendEmail() {
   console.log("sendEmail");
 }
 
-async function sendFiles(formData: FormData) {
-  const files = formData.getAll("files");
-  console.log("5. Sending...", files);
-  const response = await utapi.uploadFiles(files);
-  console.log(response);
+async function sendFiles(files: string[]) {
+  files.forEach(async (file) => {
+    const responses = await utapi.uploadFiles(Bun.file(file));
+    console.log("5. Sending...");
+    console.log("6. Files sent!", responses);
+  });
 }
 
-// check if files exist by filename
-async function checkFiles(files: Express.Multer.File[]): Promise<boolean> {
-  console.log("3. Checking files...");
-  for (const file of files) {
-    const filePath = `./uploads/${file.originalname}`;
-    const stats = fs.statSync(filePath);
-    if (!stats.isFile()) {
-      console.error(`${filePath} is not a complete file.`);
-      return false;
-    }
-  }
-  return true;
-}
-
-async function saveFiles(files: Express.Multer.File[]): Promise<void> {
+async function saveFiles(files: Express.Multer.File[]): Promise<boolean> {
   console.log("2. Saving files...");
-  await files.forEach((file) => {
+
+  // check if file already exists
+  const filesInDir = fs.readdirSync("./uploads");
+  files.forEach((file) => {
+    if (filesInDir.includes(file.originalname)) {
+      console.error(`${file.originalname} already exists in uploads folder.`);
+      // early return
+      return true;
+    }
+  });
+
+  // save new files
+  files.forEach((file) => {
     const filePath = `./uploads/${file.originalname}`;
     fs.writeFile(filePath, file.buffer, (err) => {
       if (err) throw err;
-      console.log("File saved in server!");
+      console.log("2a. File saved in server!");
     });
   });
+  // wait for files to be saved
+  await new Promise((resolve) => setTimeout(resolve, 10));
+
+  // validate files
+  console.log("3. Checking files...");
+  try {
+    for (const file of files) {
+      const filePath = `./uploads/${file.originalname}`;
+      const stats = fs.statSync(filePath);
+      if (!stats.isFile()) {
+        console.error(`${filePath} is not a complete file.`);
+        return false;
+      }
+    }
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
 }
