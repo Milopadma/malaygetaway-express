@@ -110,20 +110,35 @@ app.post("/sendFiles", upload.array("files"), async (req, res) => {
 
   const files = Array.from(Object.values(req.files)); // Convert files to an array
 
-  const formData = new FormData();
-
-  console.log(files);
-
+  // save these files to the uploads folder
   files.forEach((file) => {
-    formData.append("files", file.buffer, file.originalname);
+    const filePath = `./uploads/${file.originalname}`;
+    fs.writeFile(filePath, file.buffer, (err) => {
+      if (err) throw err;
+      console.log("File saved!");
+    });
   });
 
-  try {
-    const response = await utapi.uploadFiles(formData);
-    res.json({ message: "sendFiles: Data Received", response });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error sending files" });
+  // check if files exist
+  const fileExists = fs.existsSync("./uploads");
+  console.log(fileExists);
+
+  // then send files to uploadthing
+  if (!fileExists) {
+    return res.status(400).json({ message: "No files uploaded" });
+  } else {
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append("files", file);
+    });
+
+    try {
+      const response = await sendFiles(formData);
+      res.json({ message: "sendFiles: Data Received", response });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error sending files" });
+    }
   }
 });
 
@@ -133,6 +148,7 @@ app.listen(3000, () => {
   console.log(`Example app listening on port 3000`);
 });
 
+// ----------------------------------------------------------------------
 // functions
 function sendEmail() {
   const resend = new Resend("re_R8dVwJbN_Jz2neHkTJJaL3wkD6AC9dXUH");
