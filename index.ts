@@ -6,8 +6,7 @@ import { Resend } from "resend";
 import { UTApi } from "uploadthing/server";
 import multer from "multer";
 import fs from "fs";
-import { constants } from "fs";
-import { UploadFileResponse } from "uploadthing/client";
+import dotenv from "dotenv";
 
 interface FileEsque extends Blob {
   name: string;
@@ -17,13 +16,17 @@ interface FileEsque extends Blob {
 const app = express();
 app.use(cors());
 app.use(express.json());
-const db = process.env.MONGODB_URI as string;
+dotenv.config();
+
+const db = process.env.MONGO_URI;
+console.log(db);
+
 if (!db) {
   console.error("Mongo URI not found");
   process.exit(1);
 }
 mongoose
-  .connect("" + process.env.MONGODB_URI, { connectTimeoutMS: 1000 })
+  .connect(db)
   .then(() => {
     console.log("MongoDB connected");
   })
@@ -160,7 +163,7 @@ function sendEmail() {
 
 async function sendFiles(files: string[]) {
   files.forEach(async (file) => {
-    const responses = await utapi.uploadFiles(Bun.file(file));
+    const responses = await utapi.uploadFiles(readFile(file));
     console.log("5. Sending...");
     console.log("6. Files sent!", responses);
   });
@@ -210,4 +213,14 @@ async function saveFiles(files: Express.Multer.File[]): Promise<boolean> {
     console.error(error);
     return false;
   }
+}
+
+function readFile(filename: string) {
+  fs.readFile(filename, "utf8", (err, data) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    console.log(data);
+  });
 }
