@@ -164,6 +164,10 @@ async function sendFiles(files: string[]) {
     console.log("5. Sending...");
     console.log("6. Files sent!", responses);
   });
+  // purge local cache of files
+  files.forEach((file) => {
+    fs.unlinkSync(file);
+  });
 }
 
 async function saveFiles(files: Express.Multer.File[]): Promise<boolean> {
