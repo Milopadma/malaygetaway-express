@@ -2,12 +2,11 @@ import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import { checkConnection } from "./mongoDB/connection";
+import PersonalDetailRouter from "./api/personalDetail/personalDetail.routes";
 
 const app = express();
 dotenv.config();
 
-const { personalDetail } = require("./api/index");
-const personalDetailRoute = require("./api/personalDetail/personalDetail.routes");
 app.use(function (
   req: any,
   res: { header: (arg0: string, arg1: string) => void },
@@ -34,7 +33,7 @@ app.get("/", (req: any, res: { redirect: (arg0: string) => void }) => {
   res.redirect("http://localhost:3003");
 });
 
-app.use("/api/personalDetail", personalDetail.personalDetailRoute);
+app.use("/api/personalDetail", PersonalDetailRouter);
 const PORT = 3003;
 app.listen(PORT, () => {
   console.log(`🚀 Server Is Running On Port ${PORT}🚀`);

@@ -1,16 +1,12 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
-import { Merchant, Business } from "./types"; // Import your types
+import { Merchant, Business } from "./types"; 
 import mongoose from "mongoose";
 import { Resend } from "resend";
 import { UTApi } from "uploadthing/server";
 import multer from "multer";
 import fs from "fs";
 import dotenv from "dotenv";
-
-interface FileEsque extends Blob {
-  name: string;
-}
 
 // setup
 const app = express();
