@@ -10,4 +10,4 @@ MerchantRouter.post("/create", controller.createMerchant);
 MerchantRouter.put("/update/:id", controller.updateMerchant);
 MerchantRouter.delete("/delete/:id", controller.deleteMerchant);
 
-export default MerchantController;
+export default MerchantRouter;

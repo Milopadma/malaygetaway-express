@@ -12,7 +12,7 @@ const {
 /**
  * Controller class for handling merchant operations.
  */
-export class MerchantRouter {
+export class MerchantController {
   async createMerchant(
     req: {
       body: {
