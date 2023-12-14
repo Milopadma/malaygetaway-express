@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import { checkConnection } from "./mongoDB/connection";
 import PersonalDetailRouter from "./api/personalDetail/personalDetail.routes";
+import MerchantRouter from "./api/merchant/merchant.routes";
 
 const app = express();
 dotenv.config();
@@ -34,6 +35,8 @@ app.get("/", (req: any, res: { redirect: (arg0: string) => void }) => {
 });
 
 app.use("/api/personalDetail", PersonalDetailRouter);
+app.use("/api/merchant", MerchantRouter);
+
 const PORT = 3003;
 app.listen(PORT, () => {
   console.log(`🚀 Server Is Running On Port ${PORT}🚀`);

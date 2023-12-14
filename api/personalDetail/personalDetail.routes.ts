@@ -2,7 +2,6 @@ import Express from "express";
 import { PersonalDetailController } from "./personalDetail.controller";
 
 const controller = new PersonalDetailController();
-
 const PersonalDetailRouter = Express.Router();
 
 PersonalDetailRouter.get("/get", controller.getPersonalDetail);
