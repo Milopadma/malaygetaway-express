@@ -2,8 +2,12 @@ import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import { checkConnection } from "./mongoDB/connection";
-import PersonalDetailRouter from "./api/personalDetail/personalDetail.routes";
+// Mylo
 import MerchantRouter from "./api/merchant/merchant.routes";
+
+// Adit
+import PersonalDetailRouter from "./api/purchase/personalDetail/personalDetail.routes";
+import BillingAddressRouter from "./api/purchase/billingAddress/billingAddress.routes";
 
 const app = express();
 dotenv.config();
@@ -34,9 +38,14 @@ app.get("/", (req: any, res: { redirect: (arg0: string) => void }) => {
   res.redirect("http://localhost:3003");
 });
 
-app.use("/api/personalDetail", PersonalDetailRouter);
+// Mylo
 app.use("/api/merchant", MerchantRouter);
 
+// Adit
+app.use("/api/purchase/personalDetail", PersonalDetailRouter);
+app.use("/api/purchase/billingAddress", BillingAddressRouter);
+
+// Test Server Running
 const PORT = 3003;
 app.listen(PORT, () => {
   console.log(`🚀 Server Is Running On Port ${PORT}🚀`);
