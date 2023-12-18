@@ -1,25 +1,16 @@
-import { CustomerData, MerchantData, MerchantStatus, User } from "../../types";
-import { Request } from "express";
+import { MerchantData, MerchantStatus, User } from "../../types";
+import { Response } from "express";
 import userModel from "../../model/users/user.model";
-
-const {
-  sendCreated,
-  sendInternalError,
-  sendInvalid,
-  sendSuccess,
-  sendNotFound,
-  sendConflict,
-  sendUnauthorized,
-} = require("../../helpers/responses");
+import { sendInternalError, sendSuccess, sendNotFound } from "../../helpers/responses";
 
 /**
  * Controller class for handling merchant operations.
  */
 export class MerchantController {
-  async getMerchants(res: any) {
+  async getMerchants(res: Response) {
     try {
       const merchants = await userModel.find({ "data.type": "merchant" });
-      sendSuccess(res, { merchants });
+      sendSuccess(res, { data: merchants });
     } catch (error) {
       sendInternalError(res, error);
     }
@@ -33,30 +24,28 @@ export class MerchantController {
         "data.data.merchantId": merchantId,
       });
       if (!merchantsById) {
-        sendNotFound(res);
+        sendNotFound(res, "Merchant not found" );
       } else {
-        sendSuccess(res, { merchantsById });
+        sendSuccess(res, { data: merchantsById });
       }
     } catch (error) {
       sendInternalError(res, error);
     }
   }
 
-  async updateMerchantData(req: Request<MerchantData>, res: any) {
+  async updateMerchantData(req: { params: { merchantId: number }; body: { merchant: MerchantData } }, res: any) {
     try {
       const { merchantId } = req.params;
       const { merchant } = req.body;
       const merchantUpdated = (await userModel.findById(
         merchantId
-      )) as User<CustomerData>;
+      )) as User<MerchantData>;
       if (!merchantUpdated) {
-        sendNotFound(res);
+        sendNotFound(res, "Merchant not found" );
       } else {
-        // merchantUpdated.data.
-        // merchantUpdated.email = email;
-        // merchantUpdated.status = status;
-        // await merchantUpdated.save();
-        sendSuccess(res, { merchantUpdated });
+        merchantUpdated.data = merchant;
+        await merchantUpdated.save();
+        sendSuccess(res, { data: merchantUpdated });
       }
     } catch (error) {
       sendInternalError(res, error);
@@ -79,14 +68,14 @@ export class MerchantController {
         merchantId
       )) as User<MerchantData>;
       if (!merchant) {
-        sendNotFound(res);
+        sendNotFound(res, "Merchant not found" );
       } else {
         merchant.data.status =
           merchant.data.status === MerchantStatus.ACCEPTED
             ? MerchantStatus.REJECTED
             : MerchantStatus.ACCEPTED;
         await merchant.save();
-        sendSuccess(res, { merchant });
+        sendSuccess(res, { data: merchant });
       }
     } catch (error) {
       sendInternalError(res, error);
