@@ -1,5 +1,5 @@
 import PersonalDetail from "../../../model/purchase-model/personalDetail.model";
-const {
+import {
   sendCreated,
   sendInternalError,
   sendInvalid,
@@ -7,7 +7,8 @@ const {
   sendNotFound,
   sendConflict,
   sendUnauthorized,
-} = require("../../../helpers/responses");
+} from "../../../helpers/responses";
+
 
 export class PersonalDetailController {
   async createPersonalDetail(
@@ -25,8 +26,7 @@ export class PersonalDetailController {
     res: any
   ) {
     try {
-      const { firstName, lastName, address, city, state, country, postalCode } =
-        req.body;
+      const { firstName, lastName, address, city, state, country, postalCode } = req.body;
       const personalDetail = await PersonalDetail.create({
         firstName,
         lastName,
@@ -36,32 +36,35 @@ export class PersonalDetailController {
         country,
         postalCode,
       });
-      sendCreated(res, { personalDetail });
+      sendCreated(res, { data: { personalDetail } });
     } catch (error) {
       sendInternalError(res, error);
     }
   }
+
   async getPersonalDetail(req: any, res: any) {
     try {
       const personalDetail = await PersonalDetail.find();
-      sendSuccess(res, { personalDetail });
+      sendSuccess(res, { data: { personalDetail } });
     } catch (error) {
       sendInternalError(res, error);
     }
   }
+
   async getPersonalDetailById(req: { params: { id: any } }, res: any) {
     try {
       const { id } = req.params;
       const personalDetail = await PersonalDetail.findById(id);
       if (!personalDetail) {
-        sendNotFound(res);
+        sendNotFound(res, "Personal detail not found");
       } else {
-        sendSuccess(res, { personalDetail });
+        sendSuccess(res, { data: { personalDetail } });
       }
     } catch (error) {
       sendInternalError(res, error);
     }
   }
+
   async updatePersonalDetail(
     req: {
       params: { id: any };
@@ -79,11 +82,11 @@ export class PersonalDetailController {
   ) {
     try {
       const { id } = req.params;
-      const { firstName, lastName, address, city, state, country, postalCode } =
-        req.body;
+      const { firstName, lastName, address, city, state, country, postalCode } = req.body;
       const personalDetail = await PersonalDetail.findById(id);
+
       if (!personalDetail) {
-        sendNotFound(res);
+        sendNotFound(res, "Personal detail not found");
       } else {
         personalDetail.firstName = firstName;
         personalDetail.lastName = lastName;
@@ -92,21 +95,24 @@ export class PersonalDetailController {
         personalDetail.state = state;
         personalDetail.country = country;
         personalDetail.postalCode = postalCode;
+
         await personalDetail.save();
-        sendSuccess(res, { personalDetail });
+        sendSuccess(res, { data: { personalDetail } });
       }
     } catch (error) {
       sendInternalError(res, error);
     }
   }
+
   async deletePersonalDetail(req: { params: { id: any } }, res: any) {
     try {
       const { id } = req.params;
       const personalDetail = await PersonalDetail.findByIdAndDelete(id);
+
       if (!personalDetail) {
-        sendNotFound(res);
+        sendNotFound(res, "Personal detail not found");
       } else {
-        sendSuccess(res, { personalDetail });
+        sendSuccess(res, { data: { personalDetail } });
       }
     } catch (error) {
       sendInternalError(res, error);

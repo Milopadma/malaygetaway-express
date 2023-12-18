@@ -1,4 +1,2 @@
-module.exports = {
-    billingAddressRoute: require("./billingAddress.routes"),
-  };
-  
+import * as billingAddressRoute from './billingAddress.routes';
+export { billingAddressRoute };
