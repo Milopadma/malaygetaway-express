@@ -1,22 +1,16 @@
-import mongoose from "mongoose";
+import mongoose, { model } from "mongoose";
+import { Schema } from "mongoose";
+import { Merchant, MerchantStatus } from "../types";
 
-export enum MerchantStatus {
-    ACCEPTED = "accepted",
-    REJECTED = "rejected",
-    PENDING = "pending"
-}
-
-const merchantSchema = new mongoose.Schema({
-    id: Number,
-    username: String,
-    password: String,
-    phoneNumber: Number,
-    email: String,
-    status: {
-        type: String,
-        enum: Object.values(MerchantStatus),
-        default: MerchantStatus.PENDING
-    }
+const merchantSchema = new Schema<Merchant>({
+  id: { type: Number, required: true, unique: true },
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  phoneNumber: { type: Number, required: true },
+  email: { type: String, required: true },
+  status: { type: String, required: true, enum: Object.values(MerchantStatus) },
 });
 
-export default mongoose.model("Merchant", merchantSchema);
+const merchantModel = model<Merchant>("Merchant", merchantSchema);
+
+export default merchantModel;

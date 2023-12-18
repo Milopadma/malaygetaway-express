@@ -1,4 +1,7 @@
-import merchantModel, { MerchantStatus } from "../../model/merchant.model";
+import merchantModel from "../../model/merchant.model";
+import { Model, model } from "mongoose";
+import { Merchant, MerchantStatus } from "../../types";
+import { Request, Response } from "express";
 const {
   sendCreated,
   sendInternalError,
@@ -13,33 +16,18 @@ const {
  * Controller class for handling merchant operations.
  */
 export class MerchantController {
-  async createMerchant(
-    req: {
-      body: {
-        firstName: any;
-        lastName: any;
-        address: any;
-        city: any;
-        state: any;
-        country: any;
-        postalCode: any;
-      };
-    },
-    res: any
-  ) {
+  /**
+   * Creates a new merchant registration.
+   * @param req - The request object containing the merchant details.
+   * @param res - The response object.
+   * @returns A promise that resolves to the created merchant registration.
+   */
+  async createMerchant(req: Request<Merchant>, res: Response) {
+    console.log("console.log", req.body);
     try {
-      const { firstName, lastName, address, city, state, country, postalCode } =
-        req.body;
-      const merchantRegistration = await merchantModel.create({
-        firstName,
-        lastName,
-        address,
-        city,
-        state,
-        country,
-        postalCode,
-      });
-      sendCreated(res, { merchantRegistration });
+      const newMerchant = new merchantModel(req.body);
+      await newMerchant.save();
+      sendCreated(res, { newMerchant });
     } catch (error) {
       sendInternalError(res, error);
     }
