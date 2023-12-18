@@ -1,6 +1,6 @@
 import merchantModel from "../../model/merchant.model";
 import { Model, model } from "mongoose";
-import { Merchant, MerchantStatus } from "../../types";
+import { MerchantData, MerchantStatus, User } from "../../types";
 import { Request, Response } from "express";
 const {
   sendCreated,
@@ -22,10 +22,10 @@ export class MerchantController {
    * @param res - The response object.
    * @returns A promise that resolves to the created merchant registration.
    */
-  async createMerchant(req: Request<Merchant>, res: Response) {
+  async createMerchant(req: Request<User>, res: Response) {
     console.log("console.log", req.body);
     try {
-      const newMerchant = new merchantModel(req.body);
+      const newMerchant = new userModel(req.body);
       await newMerchant.save();
       sendCreated(res, { newMerchant });
     } catch (error) {

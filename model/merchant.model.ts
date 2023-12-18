@@ -1,8 +1,8 @@
 import mongoose, { model } from "mongoose";
 import { Schema } from "mongoose";
-import { Merchant, MerchantStatus } from "../types";
+import { MerchantData, MerchantStatus } from "../types";
 
-const merchantSchema = new Schema<Merchant>({
+const merchantSchema = new Schema<MerchantData>({
   id: { type: Number, required: true, unique: true },
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
@@ -11,6 +11,6 @@ const merchantSchema = new Schema<Merchant>({
   status: { type: String, required: true, enum: Object.values(MerchantStatus) },
 });
 
-const merchantModel = model<Merchant>("Merchant", merchantSchema);
+const merchantModel = model<MerchantData>("Merchant", merchantSchema);
 
 export default merchantModel;
