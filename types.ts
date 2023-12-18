@@ -1,12 +1,14 @@
 // UserType
 export enum UserType {
+  EMPTY = "empty",
   MERCHANT = "merchant",
   CUSTOMER = "customer",
   MINISTRY_OFFICER = "ministry_officer"
 }
 
 // login types
-export interface User {
+export interface User<UserTypeData = { type: UserType.EMPTY; data: null }> {
+  [x: string]: any;
   userId: number;
   username: string;
   password: string;
@@ -15,6 +17,7 @@ export interface User {
 
 // user types and their data
 export type UserTypeData = 
+  | { type: UserType.EMPTY; data: null}
   | { type: UserType.MERCHANT; data: MerchantData }
   | { type: UserType.CUSTOMER; data: CustomerData }
   | { type: UserType.MINISTRY_OFFICER; data: MinistryOfficerData };

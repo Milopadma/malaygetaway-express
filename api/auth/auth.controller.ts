@@ -1,7 +1,7 @@
 import { model } from "mongoose";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { Login } from "../../types";
+import { Login, User } from "../../types";
 import dotenv from "dotenv";
 import { Model } from "mongoose";
 
@@ -17,13 +17,12 @@ const {
 dotenv.config();
 
     export class AuthController {
-        private userModel: Model<User>; // Replace 'User' with your user model
-
+        private userModel: Model<User<>>; // Replace 'User' with your user model
         constructor(userModel: Model<User>) {
             this.userModel = userModel;
         }
 
-        async login(req: Request<Login>, res: Response) {
+        async login(req: Request<User>, res: Response) {
             console.log("console.log", req.body);
             try {
                 const { email, password } = req.body;
