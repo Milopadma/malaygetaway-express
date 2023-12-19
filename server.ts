@@ -8,25 +8,15 @@ import MerchantRouter from "./api/merchant/merchant.routes";
 // Adit
 import PersonalDetailRouter from "./api/purchase/personalDetail/personalDetail.routes";
 import BillingAddressRouter from "./api/purchase/billingAddress/billingAddress.routes";
+import CreditCardRouter from "./api/purchase/paymentMethod/creditCard/creditCard.routes";
 
 const app = express();
 dotenv.config();
 
-app.use(function (
-  req: any,
-  res: { header: (arg0: string, arg1: string) => void },
-  next: () => void
-) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  next();
-});
-
 const corsOption = {
-  origin: "*",
+  origin: 'http://localhost:64350', // URL frontend
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true // Penting jika menggunakan cookies atau auth headers
 };
 app.use(cors(corsOption));
 app.use(express.json());
@@ -44,6 +34,7 @@ app.use("/api/merchant", MerchantRouter);
 // Adit
 app.use("/api/purchase/personalDetail", PersonalDetailRouter);
 app.use("/api/purchase/billingAddress", BillingAddressRouter);
+app.use("/api/purchase/paymentMethod/creditCard", CreditCardRouter);
 
 // Test Server Running
 const PORT = 3003;
