@@ -1,9 +1,9 @@
 import {
   Business,
   MerchantData,
-  MerchantStatus,
-  User,
   UserType,
+  User,
+  MerchantStatus,
 } from "../../types";
 import { Response } from "express";
 import userModel from "../../model/users/user.model";
@@ -13,7 +13,6 @@ import {
   sendSuccess,
   sendNotFound,
 } from "../../helpers/responses";
-import { Model } from "mongoose";
 
 /**
  * Controller class for handling merchant operations.
@@ -25,17 +24,34 @@ export class MerchantController {
   ) {
     const { merchant, business } = req.body;
     try {
-      const newMerchant = new userModel(merchant);
+      // creating a new merchant
+      const newUser: User<{ type: UserType.MERCHANT; data: MerchantData }> = {
+        userId: 123,
+        username: "john.doe@example.com",
+        password: "password123",
+        data: {
+          type: UserType.MERCHANT,
+          data: {
+            merchantId: merchant.merchantId,
+            email: merchant.email,
+            phoneNumber: merchant.phoneNumber,
+            status: MerchantStatus.PENDING, // just ignore the merchant status from the request body since at this point it needs to always be PENDING
+          },
+        },
+      };
+
+      // new user from merchant data
+      const newMerchantUser = new userModel(newUser);
       const newBusiness = new businessModel(business);
-      await newMerchant.save();
+      await newMerchantUser.save();
       await newBusiness.save();
-      sendSuccess(res, { data: newMerchant });
+      sendSuccess(res, { data: newMerchantUser });
     } catch (error) {
       sendInternalError(res, error);
     }
   }
 
-  async getMerchants(res: Response) {
+  async getMerchants(req: any, res: Response) {
     try {
       const merchants = await userModel.find({ "data.type": "merchant" });
       sendSuccess(res, { data: merchants });
