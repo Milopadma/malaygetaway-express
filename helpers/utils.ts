@@ -1,7 +1,7 @@
 import { Resend } from "resend";
 import { readFile } from "fs/promises";
 import fs from "fs";
-import { utapi } from "../server";
+import { utapi } from "~/server";
 
 // ----------------------------------------------------------------------
 // email related functions
