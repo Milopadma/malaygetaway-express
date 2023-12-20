@@ -1,4 +1,4 @@
-import CreditCard from "../../../../model/purchase-model/creditCard.model";
+import CreditCard from "../../../../model/purchase/creditCard.model";
 import {
   sendCreated,
   sendInternalError,

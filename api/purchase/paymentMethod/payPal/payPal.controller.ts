@@ -1,4 +1,4 @@
-import PayPal from "../../../../model/purchase-model/payPal.model";
+import PayPal from "../../../../model/purchase/payPal.model";
 import {
   sendCreated,
   sendInternalError,
