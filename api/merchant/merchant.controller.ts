@@ -46,6 +46,11 @@ export class MerchantController {
       await newMerchantUser.save();
       await newBusiness.save();
       sendSuccess(res, { data: newMerchantUser });
+
+      // trigger send email
+
+
+
     } catch (error) {
       sendInternalError(res, error);
     }
