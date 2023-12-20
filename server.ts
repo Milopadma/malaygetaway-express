@@ -1,6 +1,8 @@
 import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
+import session from "express-session";
+
 import { checkConnection } from "./mongoDB/connection";
 // Mylo
 import MerchantRouter from "./api/merchant/merchant.routes";
@@ -9,7 +11,6 @@ import AuthRouter from "./api/auth/auth.routes";
 // Adit
 import PersonalDetailRouter from "./api/purchase/personalDetail/personalDetail.routes";
 import BillingAddressRouter from "./api/purchase/billingAddress/billingAddress.routes";
-import session from "express-session";
 
 const app = express();
 dotenv.config();

@@ -107,27 +107,25 @@ export class MerchantController {
    * @param res - The response object.
    * @returns A promise that resolves to the updated merchant registration.
    */
-  // async toggleMerchantStatus(
-  //   req: { params: { merchantId: number } },
-  //   res: any
-  // ) {
-  //   try {
-  //     const { merchantId } = req.params;
-  //     const merchant = (await userModel.findById(
-  //       merchantId
-  //     ));
-  //     if (!merchant) {
-  //       sendNotFound(res, "Merchant not found" );
-  //     } else {
-  //       merchant.data.data.status =
-  //         merchant.data.data.status === MerchantStatus.ACCEPTED
-  //           ? MerchantStatus.REJECTED
-  //           : MerchantStatus.ACCEPTED;
-  //       await merchant.save();
-  //       sendSuccess(res, { data: merchant });
-  //     }
-  //   } catch (error) {
-  //     sendInternalError(res, error);
-  //   }
-  // }
+  async toggleMerchantStatus(
+    req: { params: { merchantId: number } },
+    res: any
+  ) {
+    try {
+      const { merchantId } = req.params;
+      const merchant = await userModel.findById(merchantId);
+      if (!merchant) {
+        sendNotFound(res, "Merchant not found");
+      } else {
+        merchant.data.data.status =
+          merchant.data.data.status === MerchantStatus.ACCEPTED
+            ? MerchantStatus.REJECTED
+            : MerchantStatus.ACCEPTED;
+        await merchant.save();
+        sendSuccess(res, { data: merchant });
+      }
+    } catch (error) {
+      sendInternalError(res, error);
+    }
+  }
 }
