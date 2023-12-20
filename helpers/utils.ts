@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { readFile } from "fs/promises";
 import fs from "fs";
 import { utapi } from "../server";
 
@@ -19,9 +20,9 @@ export function sendEmail(email: string, subject: string, html: string) {
 
 // ----------------------------------------------------------------------
 // files related functions
-export async function sendFiles(files: string[]) {
+export async function sendFiles(files: string[]): Promise<any> {
   files.forEach(async (file) => {
-    const responses = await utapi.uploadFiles(readFile(file));
+    const responses = await utapi.uploadFiles(Bun.file(file));
     console.log("5. Sending...");
     console.log("6. Files sent!", responses);
   });
@@ -29,6 +30,7 @@ export async function sendFiles(files: string[]) {
   files.forEach((file) => {
     fs.unlinkSync(file);
   });
+  return true;
 }
 
 export async function saveFiles(
@@ -57,7 +59,7 @@ export async function saveFiles(
     const filePath = `./uploads/${file.originalname}`;
     fs.writeFile(filePath, file.buffer, (err) => {
       if (err) throw err;
-      console.log("2a. File saved in server!");
+      console.log("2b. File saved in server!");
     });
   });
   // wait for files to be saved
@@ -81,12 +83,6 @@ export async function saveFiles(
   }
 }
 
-function readFile(filename: string) {
-  fs.readFile(filename, "utf8", (err, data) => {
-    if (err) {
-      console.error(err);
-      return;
-    }
-    console.log(data);
-  });
+async function fileread(filename: string) {
+  const file = await readFile(filename, "utf8");
 }

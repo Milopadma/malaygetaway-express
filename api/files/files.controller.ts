@@ -23,7 +23,8 @@ export class FilesController {
           );
           const response = await sendFiles(filePaths);
           //   res.json({ message: "sendFiles: Data Received", response });
-          sendSuccess(res, { data: response });
+          //   sendSuccess(res, { data: response });
+          console.log("6. Files sent!", response);
         } catch (error) {
           console.error(error);
           //   res.status(500).json({ message: "Error sending files" });
@@ -33,6 +34,17 @@ export class FilesController {
       sendSuccess(res, { data: req.file });
     } catch (error) {
       console.log("error", error);
+      sendInternalError(res, error);
+    }
+  }
+
+  async testUpload(req: any, res: any) {
+    try {
+      const response = await sendFiles(["./uploads/gimmeasec.png"]);
+      console.log("6. Files sent!", response);
+      sendSuccess(res, { data: response });
+    } catch (error) {
+      console.error(error);
       sendInternalError(res, error);
     }
   }

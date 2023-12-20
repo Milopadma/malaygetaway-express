@@ -2,7 +2,8 @@
   "name": "malaygetaway-express",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "module": "server.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npm run ts-node server.ts --watch",
@@ -12,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "bun-types": "latest"
+    "bun-types": "^1.0.18-1"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
