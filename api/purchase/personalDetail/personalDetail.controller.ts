@@ -1,4 +1,4 @@
-import PersonalDetail from "../../../model/purchase-model/personalDetail.model";
+import PersonalDetail from "../../../model/purchase/personalDetail.model";
 import {
   sendCreated,
   sendInternalError,

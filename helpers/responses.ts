@@ -1,4 +1,4 @@
-import { Response } from 'express';
+import { Response } from "express";
 
 interface ResponsePayload {
   message?: string;
@@ -6,14 +6,10 @@ interface ResponsePayload {
   code?: number;
   data?: any;
   errors?: any;
-  
 }
 
-export const sendSuccess = (
-  res: Response,
-  payload: ResponsePayload
-) => {
-  res.status(200).send({
+export const sendSuccess = (res: Response, payload: ResponsePayload) => {
+  res.status(200).json({
     status: "SUCCESS",
     code: 200,
     ...payload,
@@ -21,11 +17,8 @@ export const sendSuccess = (
   });
 };
 
-export const sendCreated = (
-  res: Response,
-  payload: ResponsePayload
-) => {
-  res.status(201).send({
+export const sendCreated = (res: Response, payload: ResponsePayload) => {
+  res.status(201).json({
     status: "SUCCESS",
     code: 201,
     ...payload,
@@ -33,43 +26,31 @@ export const sendCreated = (
   });
 };
 
-export const sendNotFound = (
-  res: Response,
-  message: string
-) => {
-  res.status(404).send({
+export const sendNotFound = (res: Response, message: string) => {
+  res.status(404).json({
     status: "ERROR",
     code: 404,
     message: message || "Resource not found.",
   });
 };
 
-export const sendConflict = (
-  res: Response,
-  message: string
-) => {
-  res.status(409).send({
+export const sendConflict = (res: Response, message: string) => {
+  res.status(409).json({
     status: "CONFLICT",
     code: 409,
     message: message || "There is a conflict.",
   });
 };
 
-export const sendInvalid = (
-  res: Response,
-  message: string
-) => {
-  res.status(422).send({
+export const sendInvalid = (res: Response, message: string) => {
+  res.status(422).json({
     status: "ERROR",
     code: 422,
     message: message || "Invalid attributes.",
   });
 };
 
-export const sendUnauthorized = (
-  res: Response,
-  message: string
-) => {
+export const sendUnauthorized = (res: Response, message: string) => {
   res.status(401).json({
     status: "ERROR",
     code: 401,
@@ -77,10 +58,7 @@ export const sendUnauthorized = (
   });
 };
 
-export const sendForbidden = (
-  res: Response,
-  message: string
-) => {
+export const sendForbidden = (res: Response, message: string) => {
   res.status(403).json({
     status: "ERROR",
     code: 403,
@@ -88,11 +66,8 @@ export const sendForbidden = (
   });
 };
 
-export const sendInternalError = (
-  res: Response,
-  errors: any
-) => {
-  res.status(500).send({
+export const sendInternalError = (res: Response, errors: any) => {
+  res.status(500).json({
     status: "ERROR",
     code: 500,
     message: "Something Error.",

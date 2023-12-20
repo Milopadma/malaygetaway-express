@@ -1,139 +1,100 @@
-import merchantModel, { MerchantStatus } from "../../model/merchant.model";
-const {
-  sendCreated,
+import {
+  Business,
+  MerchantData,
+  UserType,
+  User,
+  MerchantStatus,
+} from "../../types";
+import { Response } from "express";
+import userModel from "../../model/users/user.model";
+import businessModel from "../../model/business/business.model";
+import {
   sendInternalError,
-  sendInvalid,
   sendSuccess,
   sendNotFound,
-  sendConflict,
-  sendUnauthorized,
-} = require("../../helpers/responses");
+} from "../../helpers/responses";
 
 /**
  * Controller class for handling merchant operations.
  */
 export class MerchantController {
-  async createMerchant(
-    req: {
-      body: {
-        firstName: any;
-        lastName: any;
-        address: any;
-        city: any;
-        state: any;
-        country: any;
-        postalCode: any;
-      };
-    },
-    res: any
+  async newMerchant(
+    req: { body: { merchant: MerchantData; business: Business } },
+    res: Response
   ) {
+    const { merchant, business } = req.body;
     try {
-      const { firstName, lastName, address, city, state, country, postalCode } =
-        req.body;
-      const merchantRegistration = await merchantModel.create({
-        firstName,
-        lastName,
-        address,
-        city,
-        state,
-        country,
-        postalCode,
+      // creating a new merchant
+      const newUser: User<{ type: UserType.MERCHANT; data: MerchantData }> = {
+        userId: 123,
+        username: "john.doe@example.com",
+        password: "password123",
+        data: {
+          type: UserType.MERCHANT,
+          data: {
+            merchantId: merchant.merchantId,
+            email: merchant.email,
+            phoneNumber: merchant.phoneNumber,
+            status: MerchantStatus.PENDING, // just ignore the merchant status from the request body since at this point it needs to always be PENDING
+          },
+        },
+      };
+
+      // new user from merchant data
+      const newMerchantUser = new userModel(newUser);
+      const newBusiness = new businessModel(business);
+      await newMerchantUser.save();
+      await newBusiness.save();
+      sendSuccess(res, { data: newMerchantUser });
+    } catch (error) {
+      sendInternalError(res, error);
+    }
+  }
+
+  async getMerchants(req: any, res: Response) {
+    try {
+      const merchants = await userModel.find({ "data.type": "merchant" });
+      sendSuccess(res, { data: merchants });
+    } catch (error) {
+      sendInternalError(res, error);
+    }
+  }
+
+  async getMerchantById(req: { params: { merchantId: number } }, res: any) {
+    try {
+      const { merchantId } = req.params;
+      const merchantsById = await userModel.findOne({
+        "data.type": "merchant",
+        "data.data.merchantId": merchantId,
       });
-      sendCreated(res, { merchantRegistration });
-    } catch (error) {
-      sendInternalError(res, error);
-    }
-  }
-
-  /**
-   * Retrieves all merchant registrations.
-   * @param req - The request object.
-   * @param res - The response object.
-   * @returns A promise that resolves to an array of merchant registrations.
-   */
-  async getMerchant(req: any, res: any) {
-    try {
-      const merchantRegistration = await merchantModel.find();
-      sendSuccess(res, { merchantRegistration });
-    } catch (error) {
-      sendInternalError(res, error);
-    }
-  }
-
-  /**
-   * Retrieves a merchant registration by ID.
-   * @param req - The request object containing the merchant ID.
-   * @param res - The response object.
-   * @returns A promise that resolves to the found merchant registration.
-   */
-  async getMerchantById(req: { params: { id: any } }, res: any) {
-    try {
-      const { id } = req.params;
-      const merchantRegistration = await merchantModel.findById(id);
-      if (!merchantRegistration) {
-        sendNotFound(res);
+      if (!merchantsById) {
+        sendNotFound(res, "Merchant not found");
       } else {
-        sendSuccess(res, { merchantRegistration });
+        sendSuccess(res, { data: merchantsById });
       }
     } catch (error) {
       sendInternalError(res, error);
     }
   }
 
-  /**
-   * Updates a merchant registration.
-   * @param req - The request object containing the merchant ID and updated details.
-   * @param res - The response object.
-   * @returns A promise that resolves to the updated merchant registration.
-   */
-  async updateMerchant(
-    req: {
-      params: { id: any };
-      body: {
-        username: any;
-        password: any;
-        phoneNumber: any;
-        email: any;
-        status: any;
-      };
-    },
+  async updateMerchantData(
+    req: { params: { merchantId: number }; body: { merchant: MerchantData } },
     res: any
   ) {
     try {
-      const { id } = req.params;
-      const { username, password, phoneNumber, email, status } = req.body;
-      const merchantRegistration = await merchantModel.findById(id);
-      if (!merchantRegistration) {
-        sendNotFound(res);
+      const { merchantId } = req.params;
+      const { merchant } = req.body;
+      const merchantUpdated = await userModel.findOne({
+        "data.type": "merchant",
+        "data.data.merchantId": merchantId,
+      });
+      if (!merchantUpdated) {
+        sendNotFound(res, "Merchant not found");
       } else {
-        merchantRegistration.id = id;
-        merchantRegistration.username = username;
-        merchantRegistration.password = password;
-        merchantRegistration.phoneNumber = phoneNumber;
-        merchantRegistration.email = email;
-        merchantRegistration.status = status;
-        await merchantRegistration.save();
-        sendSuccess(res, { merchantRegistration });
-      }
-    } catch (error) {
-      sendInternalError(res, error);
-    }
-  }
-
-  /**
-   * Deletes a merchant registration.
-   * @param req - The request object containing the merchant ID.
-   * @param res - The response object.
-   * @returns A promise that resolves to the deleted merchant registration.
-   */
-  async deleteMerchant(req: { params: { id: any } }, res: any) {
-    try {
-      const { id } = req.params;
-      const merchantRegistration = await merchantModel.findByIdAndDelete(id);
-      if (!merchantRegistration) {
-        sendNotFound(res);
-      } else {
-        sendSuccess(res, { merchantRegistration });
+        console.log("merchantUpdated", merchantUpdated);
+        merchantUpdated.data.data = merchant;
+        await merchantUpdated.save();
+        sendSuccess(res, { data: merchantUpdated });
       }
     } catch (error) {
       sendInternalError(res, error);
@@ -146,22 +107,27 @@ export class MerchantController {
    * @param res - The response object.
    * @returns A promise that resolves to the updated merchant registration.
    */
-  async toggleMerchantStatus(req: { params: { id: any } }, res: any) {
-    try {
-      const { id } = req.params;
-      const merchantRegistration = await merchantModel.findById(id);
-      if (!merchantRegistration) {
-        sendNotFound(res);
-      } else {
-        merchantRegistration.status =
-          merchantRegistration.status === MerchantStatus.ACCEPTED
-            ? MerchantStatus.REJECTED
-            : MerchantStatus.ACCEPTED;
-        await merchantRegistration.save();
-        sendSuccess(res, { merchantRegistration });
-      }
-    } catch (error) {
-      sendInternalError(res, error);
-    }
-  }
+  // async toggleMerchantStatus(
+  //   req: { params: { merchantId: number } },
+  //   res: any
+  // ) {
+  //   try {
+  //     const { merchantId } = req.params;
+  //     const merchant = (await userModel.findById(
+  //       merchantId
+  //     ));
+  //     if (!merchant) {
+  //       sendNotFound(res, "Merchant not found" );
+  //     } else {
+  //       merchant.data.data.status =
+  //         merchant.data.data.status === MerchantStatus.ACCEPTED
+  //           ? MerchantStatus.REJECTED
+  //           : MerchantStatus.ACCEPTED;
+  //       await merchant.save();
+  //       sendSuccess(res, { data: merchant });
+  //     }
+  //   } catch (error) {
+  //     sendInternalError(res, error);
+  //   }
+  // }
 }

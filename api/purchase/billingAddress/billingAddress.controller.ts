@@ -1,4 +1,4 @@
-import BillingAddress from "../../../model/purchase-model/billingAddress.model";
+import BillingAddress from "../../../model/purchase/billingAddress.model";
 import {
   sendCreated,
   sendInternalError,
