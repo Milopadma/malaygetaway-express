@@ -3,7 +3,7 @@ export enum UserType {
   EMPTY = "empty",
   MERCHANT = "merchant",
   CUSTOMER = "customer",
-  MINISTRY_OFFICER = "ministry_officer"
+  MINISTRY_OFFICER = "ministry_officer",
 }
 
 // login types
@@ -15,23 +15,23 @@ export interface User<UserTypeData> {
 }
 
 // user types and their data
-export type UserTypeData = 
+export type UserTypeData =
   | { type: UserType.MERCHANT; data: MerchantData }
   | { type: UserType.CUSTOMER; data: CustomerData }
   | { type: UserType.MINISTRY_OFFICER; data: MinistryOfficerData };
 
 // merchant related interface types
 export enum MerchantStatus {
-    ACCEPTED = "accepted",
-    REJECTED = "rejected",
-    PENDING = "pending"
+  ACCEPTED = "accepted",
+  REJECTED = "rejected",
+  PENDING = "pending",
 }
 
 export interface MerchantData {
   merchantId: number;
   phoneNumber: number;
   email: string;
-  status: MerchantStatus
+  status: MerchantStatus;
 }
 
 // Customer related interface types
@@ -53,4 +53,5 @@ export interface Business {
   address: string;
   contactNumber: string;
   contactEmail: string;
+  businessFileURLs: string[];
 }
