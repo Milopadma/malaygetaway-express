@@ -33,7 +33,7 @@ const corsOption = {
 app.use(cors(corsOption));
 app.use(express.json());
 app.use(
-session({
+  session({
     secret: String(process.env.SESSION_SECRET),
     resave: false,
     saveUninitialized: true,
