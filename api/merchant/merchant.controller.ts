@@ -84,10 +84,14 @@ export class MerchantController {
     try {
       const { merchantId } = req.params;
       const { merchant } = req.body;
-      const merchantUpdated = await userModel.findById(merchantId);
+      const merchantUpdated = await userModel.findOne({
+        "data.type": "merchant",
+        "data.data.merchantId": merchantId,
+      });
       if (!merchantUpdated) {
         sendNotFound(res, "Merchant not found");
       } else {
+        console.log("merchantUpdated", merchantUpdated);
         merchantUpdated.data.data = merchant;
         await merchantUpdated.save();
         sendSuccess(res, { data: merchantUpdated });
