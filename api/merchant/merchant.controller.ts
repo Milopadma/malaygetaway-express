@@ -63,7 +63,7 @@ export class MerchantController {
   async getMerchantById(req: { params: { merchantId: number } }, res: any) {
     try {
       const { merchantId } = req.params;
-      const merchantsById = await userModel.findById({
+      const merchantsById = await userModel.findOne({
         "data.type": "merchant",
         "data.data.merchantId": merchantId,
       });
