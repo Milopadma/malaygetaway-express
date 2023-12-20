@@ -4,12 +4,12 @@ import cors from "cors";
 import { checkConnection } from "./mongoDB/connection";
 // Mylo
 import MerchantRouter from "./api/merchant/merchant.routes";
+import AuthRouter from "./api/auth/auth.routes";
 
 // Adit
 import PersonalDetailRouter from "./api/purchase/personalDetail/personalDetail.routes";
 import BillingAddressRouter from "./api/purchase/billingAddress/billingAddress.routes";
-import CreditCardRouter from "./api/purchase/paymentMethod/creditCard/creditCard.routes";
-import PayPalRouter from "./api/purchase/paymentMethod/payPal/payPal.routes";
+import session from "express-session";
 
 const app = express();
 dotenv.config();
@@ -21,6 +21,14 @@ const corsOption = {
 };
 app.use(cors(corsOption));
 app.use(express.json());
+app.use(
+  session({
+    secret: String(process.env.SESSION_SECRET),
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }, // Set secure to true for HTTPS
+  })
+);
 app.use(express.urlencoded({ extended: false }));
 
 checkConnection();
@@ -30,6 +38,7 @@ app.get("/", (req: any, res: { redirect: (arg0: string) => void }) => {
 });
 
 // Mylo
+app.use("/api/auth", AuthRouter);
 app.use("/api/merchant", MerchantRouter);
 
 // Adit

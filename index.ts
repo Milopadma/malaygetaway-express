@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
-import { Merchant, Business } from "./types"; 
+import { MerchantData, Business } from "./types"; 
 import mongoose from "mongoose";
 import { Resend } from "resend";
 import { UTApi } from "uploadthing/server";
@@ -75,7 +75,7 @@ app.post("/login", (req: Request, res: Response) => {
 
 // merchant register endpoint
 app.post("/merchant/register", (req: Request, res: Response) => {
-  const merchant: Merchant = JSON.parse(req.body.merchant);
+  const merchant: MerchantData = JSON.parse(req.body.merchant);
   const business: Business = JSON.parse(req.body.business);
   console.log(merchant);
   console.log(business);
