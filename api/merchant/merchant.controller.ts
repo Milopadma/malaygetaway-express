@@ -39,16 +39,16 @@ export class MerchantController {
       console.log("uniquePassword", uniquePassword);
       const uniqueMerchantEmail = await validateEmail(merchant.email);
       console.log("uniqueMerchantEmail", uniqueMerchantEmail);
-      if (uniqueMerchantEmail == null) {
-        sendConflict(res, "Email already exists");
-        throw new Error("Email already exists");
-      }
+      // if (uniqueMerchantEmail == null) {
+      //   sendConflict(res, "Email already exists");
+      //   throw new Error("Email already exists");
+      // }
       const uniquePhoneNumber = await validatePhoneNumber(merchant.phoneNumber);
       console.log("uniquePhoneNumber", uniquePhoneNumber);
-      if (uniquePhoneNumber == null) {
-        sendConflict(res, "Phone number already exists");
-        throw new Error("Phone number already exists");
-      }
+      // if (uniquePhoneNumber == null) {
+      //   sendConflict(res, "Phone number already exists");
+      //   throw new Error("Phone number already exists");
+      // }
 
       // creating a new merchant
       const newUser: User<{ type: UserType.MERCHANT; data: MerchantData }> = {
@@ -59,8 +59,8 @@ export class MerchantController {
           type: UserType.MERCHANT,
           data: {
             merchantId: uniqueId,
-            email: uniqueMerchantEmail,
-            phoneNumber: uniquePhoneNumber,
+            email: "milopadma@yahoo.com",
+            phoneNumber: 123123,
             status: MerchantStatus.PENDING, // just ignore the merchant status from the request body since at this point it needs to always be PENDING
           },
         },
@@ -75,7 +75,14 @@ export class MerchantController {
       sendEmail(
         merchant.email,
         "Account created",
-        `Your account has been created. Your username is ${uniqueUsername} and your password is ${uniquePassword}`
+        `<div>
+          <h3>MalayGetaway</h3>
+          <h1>Congratulations!</h1>
+          <div>Your account has been created.</div>
+          <div> Your username is <strong>${uniqueUsername}</strong> and your password is 
+          <strong>${uniquePassword}</strong></div>
+          <div>Explore malaysia now! <a href="https://malaygetaway-angular.milopadma.com/login">malaygetaway-angular.milopadma.com</a></div>
+        </div>`
       );
       sendSuccess(res, { data: newMerchantUser });
 

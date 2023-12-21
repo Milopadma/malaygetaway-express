@@ -10,7 +10,7 @@ export function sendEmail(email: string, subject: string, html: string) {
   const resend = new Resend("re_R8dVwJbN_Jz2neHkTJJaL3wkD6AC9dXUH");
 
   resend.emails.send({
-    from: "onboarding@resend.dev",
+    from: "no-reply@milopadma.com",
     to: email,
     subject: subject,
     html: html,
