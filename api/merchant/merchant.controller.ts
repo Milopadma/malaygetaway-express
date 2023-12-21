@@ -45,8 +45,6 @@ export class MerchantController {
         throw new Error("Phone number already exists");
       }
       const hashedPassword = await Bun.password.hash(uniqueId + uniquePassword);
-      console.log("password: ", uniqueId + uniquePassword);
-      console.log("hashedPassword: ", hashedPassword);
 
       // creating a new merchant
       const newUser: User<{ type: UserType.MERCHANT; data: MerchantData }> = {
