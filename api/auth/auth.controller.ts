@@ -8,7 +8,6 @@ dotenv.config();
 
 export class AuthController {
   async login(req: Request, res: Response) {
-    console.log("console.log", req.body);
     try {
       const { email, password } = req.body;
       // Check if the email and password combination exists in the database
@@ -17,6 +16,7 @@ export class AuthController {
         // Generate JWT token
         const token = jwt.sign({ email }, String(process.env.JWT_SECRET_KEY));
         // Store the token in the session
+        console.log("console.log", req.body);
         (req.session as any).token = token;
         res.json({ success: true, token });
       } else {

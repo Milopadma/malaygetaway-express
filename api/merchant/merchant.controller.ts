@@ -12,7 +12,14 @@ import {
   sendInternalError,
   sendSuccess,
   sendNotFound,
+  sendConflict,
 } from "../../helpers/responses";
+import {
+  generateUniqueId,
+  sendEmail,
+  validateEmail,
+  validatePhoneNumber,
+} from "~/helpers/utils";
 
 /**
  * Controller class for handling merchant operations.
@@ -24,17 +31,36 @@ export class MerchantController {
   ) {
     const { merchant, business } = req.body;
     try {
+      const uniqueId = generateUniqueId();
+      console.log("uniqueId", uniqueId);
+      const uniqueUsername = `${merchant.email.split("@")[0]}${uniqueId}`;
+      console.log("uniqueUsername", uniqueUsername);
+      const uniquePassword = Math.random().toString(36).slice(-8);
+      console.log("uniquePassword", uniquePassword);
+      const uniqueMerchantEmail = await validateEmail(merchant.email);
+      console.log("uniqueMerchantEmail", uniqueMerchantEmail);
+      if (uniqueMerchantEmail == null) {
+        sendConflict(res, "Email already exists");
+        throw new Error("Email already exists");
+      }
+      const uniquePhoneNumber = await validatePhoneNumber(merchant.phoneNumber);
+      console.log("uniquePhoneNumber", uniquePhoneNumber);
+      if (uniquePhoneNumber == null) {
+        sendConflict(res, "Phone number already exists");
+        throw new Error("Phone number already exists");
+      }
+
       // creating a new merchant
       const newUser: User<{ type: UserType.MERCHANT; data: MerchantData }> = {
-        userId: 123,
-        username: "john.doe@example.com",
-        password: "password123",
+        userId: uniqueId,
+        username: uniqueUsername,
+        password: uniqueId + uniquePassword,
         data: {
           type: UserType.MERCHANT,
           data: {
-            merchantId: merchant.merchantId,
-            email: merchant.email,
-            phoneNumber: merchant.phoneNumber,
+            merchantId: uniqueId,
+            email: uniqueMerchantEmail,
+            phoneNumber: uniquePhoneNumber,
             status: MerchantStatus.PENDING, // just ignore the merchant status from the request body since at this point it needs to always be PENDING
           },
         },
@@ -45,12 +71,15 @@ export class MerchantController {
       const newBusiness = new businessModel(business);
       await newMerchantUser.save();
       await newBusiness.save();
+      // sned email
+      sendEmail(
+        merchant.email,
+        "Account created",
+        `Your account has been created. Your username is ${uniqueUsername} and your password is ${uniquePassword}`
+      );
       sendSuccess(res, { data: newMerchantUser });
 
       // trigger send email
-
-
-
     } catch (error) {
       sendInternalError(res, error);
     }
