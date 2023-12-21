@@ -7,7 +7,7 @@ import userModel from "~/model/users/user.model";
 // ----------------------------------------------------------------------
 // email related functions
 export function sendEmail(email: string, subject: string, html: string) {
-  const resend = new Resend("re_R8dVwJbN_Jz2neHkTJJaL3wkD6AC9dXUH");
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
   resend.emails.send({
     from: "no-reply@milopadma.com",

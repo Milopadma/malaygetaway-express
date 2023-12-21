@@ -37,7 +37,11 @@ app.use(cors(corsOption));
 app.use(express.json());
 
 if (!process.env.JWT_SECRET_KEY) {
-  console.error("JWT secret not found");
+  console.error("JWT secret not found!");
+  process.exit(1);
+}
+if (!process.env.RESEND_API_KEY) {
+  console.error("RESEND Secret key not found!");
   process.exit(1);
 }
 

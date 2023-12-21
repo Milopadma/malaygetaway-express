@@ -32,23 +32,18 @@ export class MerchantController {
     const { merchant, business } = req.body;
     try {
       const uniqueId = generateUniqueId();
-      console.log("uniqueId", uniqueId);
       const uniqueUsername = `${merchant.email.split("@")[0]}${uniqueId}`;
-      console.log("uniqueUsername", uniqueUsername);
       const uniquePassword = Math.random().toString(36).slice(-8);
-      console.log("uniquePassword", uniquePassword);
       const uniqueMerchantEmail = await validateEmail(merchant.email);
-      console.log("uniqueMerchantEmail", uniqueMerchantEmail);
-      // if (uniqueMerchantEmail == null) {
-      //   sendConflict(res, "Email already exists");
-      //   throw new Error("Email already exists");
-      // }
+      if (uniqueMerchantEmail == null) {
+        sendConflict(res, "Email already exists");
+        throw new Error("Email already exists");
+      }
       const uniquePhoneNumber = await validatePhoneNumber(merchant.phoneNumber);
-      console.log("uniquePhoneNumber", uniquePhoneNumber);
-      // if (uniquePhoneNumber == null) {
-      //   sendConflict(res, "Phone number already exists");
-      //   throw new Error("Phone number already exists");
-      // }
+      if (uniquePhoneNumber == null) {
+        sendConflict(res, "Phone number already exists");
+        throw new Error("Phone number already exists");
+      }
 
       // creating a new merchant
       const newUser: User<{ type: UserType.MERCHANT; data: MerchantData }> = {
