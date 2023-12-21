@@ -35,14 +35,22 @@ const corsOption = {
 };
 app.use(cors(corsOption));
 app.use(express.json());
-app.use(
-  session({
-    secret: String(process.env.SESSION_SECRET),
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false }, // Set secure to true for HTTPS
-  })
-);
+
+if (!process.env.JWT_SECRET_KEY) {
+  console.error("JWT secret not found");
+  process.exit(1);
+}
+
+// this was causing crashes
+// app.use(
+//   session({
+//     secret: String(process.env.SESSION_SECRET),
+//     resave: false,
+//     saveUninitialized: true,
+//     cookie: { secure: false }, // Set secure to true for HTTPS
+//   })
+// );
+
 app.use(express.urlencoded({ extended: false }));
 
 // mongodb connection
@@ -62,8 +70,12 @@ if (utapi) {
   console.error("UTApi connection error");
 }
 
-app.get("/", (req: any, res: { redirect: (arg0: string) => void }) => {
-  res.redirect("http://localhost:3003");
+// app.get("/", (req: any, res: { redirect: (arg0: string) => void }) => {
+//   res.redirect("http://localhost:3003");
+// });
+
+app.get("/", (req, res) => {
+  res.send("Hello World!");
 });
 
 // Mylo's endpoints
@@ -76,7 +88,12 @@ app.use("/api/purchase/personalDetail", PersonalDetailRouter);
 app.use("/api/purchase/billingAddress", BillingAddressRouter);
 
 // Test Server Running
-const PORT = 3003;
-app.listen(PORT, () => {
-  console.log(`🚀 Server Is Running On Port ${PORT}🚀`);
+const port = process.env.PORT || 8080;
+if (!port) {
+  console.error("Port not found");
+  process.exit(1);
+}
+
+app.listen(port, () => {
+  console.log(`🚀 Server Is Running On Port ${port}🚀`);
 });
