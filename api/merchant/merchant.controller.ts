@@ -44,18 +44,21 @@ export class MerchantController {
         sendConflict(res, "Phone number already exists");
         throw new Error("Phone number already exists");
       }
+      const hashedPassword = await Bun.password.hash(uniqueId + uniquePassword);
+      console.log("password: ", uniqueId + uniquePassword);
+      console.log("hashedPassword: ", hashedPassword);
 
       // creating a new merchant
       const newUser: User<{ type: UserType.MERCHANT; data: MerchantData }> = {
         userId: uniqueId,
         username: uniqueUsername,
-        password: uniqueId + uniquePassword,
+        password: hashedPassword,
         data: {
           type: UserType.MERCHANT,
           data: {
             merchantId: uniqueId,
-            email: "milopadma@yahoo.com",
-            phoneNumber: 123123,
+            email: merchant.email,
+            phoneNumber: merchant.phoneNumber,
             status: MerchantStatus.PENDING, // just ignore the merchant status from the request body since at this point it needs to always be PENDING
           },
         },
@@ -75,7 +78,7 @@ export class MerchantController {
           <h1>Congratulations!</h1>
           <div>Your account has been created.</div>
           <div> Your username is <strong>${uniqueUsername}</strong> and your password is 
-          <strong>${uniquePassword}</strong></div>
+          <strong>${uniqueId + uniquePassword}</strong></div>
           <div>Explore malaysia now! <a href="https://malaygetaway-angular.milopadma.com/login">malaygetaway-angular.milopadma.com</a></div>
         </div>`
       );
