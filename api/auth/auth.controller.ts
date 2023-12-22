@@ -1,30 +1,42 @@
 import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import userModel from "../../model/users/user.model";
 import { sendInternalError } from "../../helpers/responses";
+import * as jose from "jose";
 
 dotenv.config();
 
 export class AuthController {
   async login(req: Request, res: Response) {
-    console.log("console.log", req.body);
     try {
-      const { email, password } = req.body;
-      // Check if the email and password combination exists in the database
-      const user = await userModel.findOne({ email, password });
-      if (user) {
-        // Generate JWT token
-        const token = jwt.sign({ email }, String(process.env.JWT_SECRET_KEY));
-        // Store the token in the session
-        (req.session as any).token = token;
-        res.json({ success: true, token });
-      } else {
-        console.log("Invalid credentials");
-        res
-          .status(401)
-          .json({ success: false, message: "Invalid credentials" });
+      const { username, password } = req.body;
+
+      const user = await userModel.findOne({ username: username });
+      if (!user) {
+        res.status(401).json({ success: false, message: "Invalid username" });
+        return;
       }
+
+      const isMatch = await Bun.password.verify(password, user.password);
+      if (!isMatch) {
+        res.status(401).json({ success: false, message: "Invalid password" });
+        return;
+      }
+
+      const secret = new TextEncoder().encode(
+        String(process.env.JWT_SECRET_KEY)
+      );
+      const alg = "HS256";
+
+      const token = await new jose.SignJWT({ "urn:example:claim": true })
+        .setProtectedHeader({ alg })
+        .setIssuedAt()
+        .setIssuer("urn:example:issuer")
+        .setAudience("urn:example:audience")
+        .setExpirationTime("2h")
+        .sign(secret);
+
+      res.json({ success: true, token: token });
     } catch (error) {
       sendInternalError(res, error);
     }
