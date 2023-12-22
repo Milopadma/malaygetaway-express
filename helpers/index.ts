@@ -1,3 +1,2 @@
-module.exports = {
-    response: require('./responses'),
-}
+import * as response from './responses';
+export { response };

@@ -13,6 +13,9 @@ import AuthRouter from "./api/auth/auth.routes";
 import PersonalDetailRouter from "./api/purchase/personalDetail/personalDetail.routes";
 import BillingAddressRouter from "./api/purchase/billingAddress/billingAddress.routes";
 import FilesRouter from "./api/files/files.routes";
+import CreditCardRouter from "./api/purchase/paymentMethod/creditCard/creditCard.routes";
+import PayPalRouter from "./api/purchase/paymentMethod/payPal/payPal.routes";
+import FormReviewRouter from "./api/review/formReview.routes";
 
 const app = express();
 dotenv.config();
@@ -32,8 +35,14 @@ app.use(function (
 
 const corsOption = {
   origin: "*",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS", // Include 'OPTIONS'
+  credentials: true,
 };
 app.use(cors(corsOption));
+
+// Enable pre-flight across the board
+app.options("*", cors(corsOption));
+
 app.use(express.json());
 
 if (!process.env.JWT_SECRET_KEY) {
@@ -54,6 +63,19 @@ if (!process.env.RESEND_API_KEY) {
 //     cookie: { secure: false }, // Set secure to true for HTTPS
 //   })
 // );
+
+// Logging Middleware for Debugging
+app.use((req, res, next) => {
+  const section = req.url.split("/")[3];
+  console.log("\n--- LOG START ---");
+  console.log(`Section : ${section}`);
+  console.log(`Time    : ${new Date().toLocaleString()}`);
+  console.log(`Method  : ${req.method}`);
+  console.log(`URL     : ${req.url}`);
+  console.log("---- LOG END ----\n");
+
+  next();
+});
 
 app.use(express.urlencoded({ extended: false }));
 
@@ -87,9 +109,12 @@ app.use("/api/auth", AuthRouter);
 app.use("/api/merchant", MerchantRouter);
 app.use("/api/files", FilesRouter);
 
-// Adit's endpoints
+// Adit
 app.use("/api/purchase/personalDetail", PersonalDetailRouter);
 app.use("/api/purchase/billingAddress", BillingAddressRouter);
+app.use("/api/purchase/paymentMethod/creditCard", CreditCardRouter);
+app.use("/api/purchase/paymentMethod/payPal", PayPalRouter);
+app.use("/api/review/formReview", FormReviewRouter);
 
 // Test Server Running
 const port = process.env.PORT || 8080;
