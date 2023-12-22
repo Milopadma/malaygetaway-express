@@ -13,7 +13,6 @@ import AuthRouter from "./api/auth/auth.routes";
 import PersonalDetailRouter from "./api/purchase/personalDetail/personalDetail.routes";
 import BillingAddressRouter from "./api/purchase/billingAddress/billingAddress.routes";
 import FilesRouter from "./api/files/files.routes";
-import CreditCardRouter from "./api/purchase/paymentMethod/creditCard/creditCard.routes";
 import PayPalRouter from "./api/purchase/paymentMethod/payPal/payPal.routes";
 import FormReviewRouter from "./api/review/formReview.routes";
 
@@ -65,6 +64,7 @@ if (!process.env.RESEND_API_KEY) {
 // );
 
 // Logging Middleware for Debugging
+app.use(express.json());
 app.use((req, res, next) => {
   const section = req.url.split("/")[3];
   console.log("\n--- LOG START ---");
@@ -72,8 +72,12 @@ app.use((req, res, next) => {
   console.log(`Time    : ${new Date().toLocaleString()}`);
   console.log(`Method  : ${req.method}`);
   console.log(`URL     : ${req.url}`);
-  console.log("---- LOG END ----\n");
 
+  // Cetak isi body request untuk metode POST, PUT, dan PATCH
+  if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
+    console.log(`Body    : ${JSON.stringify(req.body, null, 2)}`);
+  }
+  console.log("---- LOG END ----\n");
   next();
 });
 
@@ -112,7 +116,6 @@ app.use("/api/files", FilesRouter);
 // Adit
 app.use("/api/purchase/personalDetail", PersonalDetailRouter);
 app.use("/api/purchase/billingAddress", BillingAddressRouter);
-app.use("/api/purchase/paymentMethod/creditCard", CreditCardRouter);
 app.use("/api/purchase/paymentMethod/payPal", PayPalRouter);
 app.use("/api/review/formReview", FormReviewRouter);
 

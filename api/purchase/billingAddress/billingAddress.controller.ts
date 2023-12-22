@@ -13,8 +13,6 @@ export class BillingAddressController {
   async createBillingAddress(
     req: {
       body: {
-        firstName: any;
-        lastName: any;
         address: any;
         city: any;
         state: any;
@@ -25,10 +23,8 @@ export class BillingAddressController {
     res: any
   ) {
     try {
-      const { firstName, lastName, address, city, state, country, postalCode } = req.body;
+      const { address, city, state, country, postalCode } = req.body;
       const billingAddress = await BillingAddress.create({
-        firstName,
-        lastName,
         address,
         city,
         state,
@@ -68,8 +64,6 @@ export class BillingAddressController {
     req: {
       params: { id: any };
       body: {
-        firstName: any;
-        lastName: any;
         address: any;
         city: any;
         state: any;
@@ -81,14 +75,12 @@ export class BillingAddressController {
   ) {
     try {
       const { id } = req.params;
-      const { firstName, lastName, address, city, state, country, postalCode } = req.body;
+      const { address, city, state, country, postalCode } = req.body;
       const billingAddress = await BillingAddress.findById(id);
 
       if (!billingAddress) {
         sendNotFound(res, "Billing address not found");
       } else {
-        billingAddress.firstName = firstName;
-        billingAddress.lastName = lastName;
         billingAddress.address = address;
         billingAddress.city = city;
         billingAddress.state = state;
