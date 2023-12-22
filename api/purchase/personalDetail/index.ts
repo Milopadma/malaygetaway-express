@@ -1,3 +1,2 @@
-module.exports = {
-  personalDetailRoute: require("./personalDetail.routes"),
-};
+import * as personalDetailRoute from './personalDetail.routes';
+export { personalDetailRoute };

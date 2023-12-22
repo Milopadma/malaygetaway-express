@@ -1,5 +1,5 @@
-import BillingAddress from "../../../model/purchase-model/billingAddress.model";
-const {
+import BillingAddress from "../../../model/purchase/billingAddress.model";
+import {
   sendCreated,
   sendInternalError,
   sendInvalid,
@@ -7,7 +7,7 @@ const {
   sendNotFound,
   sendConflict,
   sendUnauthorized,
-} = require("../../../helpers/responses");
+} from "../../../helpers/responses";
 
 export class BillingAddressController {
   async createBillingAddress(
@@ -25,8 +25,7 @@ export class BillingAddressController {
     res: any
   ) {
     try {
-      const { firstName, lastName, address, city, state, country, postalCode } =
-        req.body;
+      const { firstName, lastName, address, city, state, country, postalCode } = req.body;
       const billingAddress = await BillingAddress.create({
         firstName,
         lastName,
@@ -36,32 +35,35 @@ export class BillingAddressController {
         country,
         postalCode,
       });
-      sendCreated(res, { billingAddress });
+      sendCreated(res, { data: { billingAddress } });
     } catch (error) {
       sendInternalError(res, error);
     }
   }
+
   async getBillingAddress(req: any, res: any) {
     try {
       const billingAddress = await BillingAddress.find();
-      sendSuccess(res, { billingAddress });
+      sendSuccess(res, { data: { billingAddress } });
     } catch (error) {
       sendInternalError(res, error);
     }
   }
+
   async getBillingAddressById(req: { params: { id: any } }, res: any) {
     try {
       const { id } = req.params;
       const billingAddress = await BillingAddress.findById(id);
       if (!billingAddress) {
-        sendNotFound(res);
+        sendNotFound(res, "Billing address not found");
       } else {
-        sendSuccess(res, { billingAddress });
+        sendSuccess(res, { data: { billingAddress } });
       }
     } catch (error) {
       sendInternalError(res, error);
     }
   }
+
   async updateBillingAddress(
     req: {
       params: { id: any };
@@ -79,11 +81,11 @@ export class BillingAddressController {
   ) {
     try {
       const { id } = req.params;
-      const { firstName, lastName, address, city, state, country, postalCode } =
-        req.body;
+      const { firstName, lastName, address, city, state, country, postalCode } = req.body;
       const billingAddress = await BillingAddress.findById(id);
+
       if (!billingAddress) {
-        sendNotFound(res);
+        sendNotFound(res, "Billing address not found");
       } else {
         billingAddress.firstName = firstName;
         billingAddress.lastName = lastName;
@@ -92,21 +94,24 @@ export class BillingAddressController {
         billingAddress.state = state;
         billingAddress.country = country;
         billingAddress.postalCode = postalCode;
+
         await billingAddress.save();
-        sendSuccess(res, { billingAddress });
+        sendSuccess(res, { data: { billingAddress } });
       }
     } catch (error) {
       sendInternalError(res, error);
     }
   }
+
   async deleteBillingAddress(req: { params: { id: any } }, res: any) {
     try {
       const { id } = req.params;
       const billingAddress = await BillingAddress.findByIdAndDelete(id);
+
       if (!billingAddress) {
-        sendNotFound(res);
+        sendNotFound(res, "Billing address not found");
       } else {
-        sendSuccess(res, { billingAddress });
+        sendSuccess(res, { data: { billingAddress } });
       }
     } catch (error) {
       sendInternalError(res, error);
