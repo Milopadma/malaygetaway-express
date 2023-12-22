@@ -6,8 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npm run ts-node server.ts --watch",
-    "start": "ts-node server.ts"
+    "dev": "bun --watch index.ts"
   },
   "keywords": [],
   "author": "",
