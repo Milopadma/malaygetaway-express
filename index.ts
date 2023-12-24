@@ -16,10 +16,11 @@ import BillingAddressRouter from "./api/purchase/billingAddress/billingAddress.r
 import CreditCardRouter from "./api/purchase/paymentMethod/creditCard/creditCard.routes";
 import PayPalRouter from "./api/purchase/paymentMethod/payPal/payPal.routes";
 import FormReviewRouter from "./api/review/formReview.routes";
-import { checkKeys } from "./helpers/utils";
+import { checkKeys, sendFiles } from "./helpers/utils";
 import formidable from "formidable";
 import fs from "fs";
 import path from "path";
+import { FilesController } from "./api/files/files.controller";
 
 const app = express();
 dotenv.config();
@@ -78,22 +79,40 @@ app.get("/api/hello", (req, res) => {
 app.use("/api/auth", AuthRouter);
 app.use("/api/merchant", MerchantRouter);
 // ---------------------------------------------------------------
-app.post("/api/files/upload", (req, res) => {
-  const form = formidable({
-    uploadDir: path.join(import.meta.dir, "uploads"),
-    keepExtensions: true,
-  });
+const fc = new FilesController();
 
-  form.parse(req, (err, fields, files) => {
-    if (err) {
-      console.error("Error", err);
-      throw err;
+declare global {
+  namespace Express {
+    interface Request {
+      filePaths?: string[];
     }
-    console.log("Fields", fields);
-    console.log("Files", files);
-    res.json({ fields, files });
-  });
-});
+  }
+}
+
+app.post(
+  "/api/files/upload",
+  (req, res, next) => {
+    const form = formidable({
+      uploadDir: path.join(import.meta.dir, "uploads"),
+      keepExtensions: true,
+    });
+
+    const filePaths: string[] = []; // Create an array to store file paths
+
+    form.on("file", function (field, file) {
+      // Push each file path into the array
+      filePaths.push(file.filepath);
+    });
+
+    form.on("end", function () {
+      req.filePaths = filePaths; // Attach the file paths to the req object
+      next(); // call next() to move to the next middleware function
+    });
+
+    form.parse(req);
+  },
+  fc.sendFiles
+);
 
 // Adit
 app.use("/api/purchase/personalDetail", PersonalDetailRouter);

@@ -38,6 +38,18 @@ export class FilesController {
     }
   }
 
+  async sendFiles(req: any, res: any) {
+    console.log("1. Received files from FE");
+    try {
+      const paths = req.filePaths;
+      const data = await sendFiles(paths); // Wait for sendFiles to finish
+      sendSuccess(res, { data });
+    } catch (error) {
+      console.error(error);
+      sendInternalError(res, error);
+    }
+  }
+
   async testUpload(req: any, res: any) {
     try {
       const response = await sendFiles(["./uploads/gimmeasec.png"]);

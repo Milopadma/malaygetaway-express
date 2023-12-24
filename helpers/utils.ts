@@ -82,17 +82,28 @@ export async function validatePhoneNumber(
 
 // ----------------------------------------------------------------------
 // files related functions
-export async function sendFiles(files: string[]): Promise<any> {
-  files.forEach(async (file) => {
-    const responses = await utapi.uploadFiles(Bun.file(file));
+export async function sendFiles(files: string[]): Promise<any[]> {
+  // Map each file to a promise
+  const promises = files.map(async (file) => {
+    console.log("4. Reading file...", file);
+    // read file
+    const fileData = await Bun.file(file);
+    console.log("4a. File read!", fileData.type);
+    const response = await utapi.uploadFiles(fileData);
     console.log("5. Sending...");
-    console.log("6. Files sent!", responses);
+    console.log("6. Files sent to utapi!", response);
+    return response;
   });
+
+  // Wait for all promises to resolve
+  const responses = await Promise.all(promises);
+
   // purge local cache of files
-  files.forEach((file) => {
-    fs.unlinkSync(file);
-  });
-  return true;
+  // files.forEach((file) => {
+  //   fs.unlinkSync(file);
+  // });
+
+  return responses;
 }
 
 export async function saveFiles(files: any): Promise<boolean> {
