@@ -72,6 +72,7 @@ app.use((req, res, next) => {
   console.log(`Time    : ${new Date().toLocaleString()}`);
   console.log(`Method  : ${req.method}`);
   console.log(`URL     : ${req.url}`);
+  console.log(`Body    : ${JSON.stringify(req.body)}`);
   console.log("---- LOG END ----\n");
 
   next();

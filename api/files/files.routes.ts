@@ -6,11 +6,7 @@ const controller = new FilesController();
 const FilesRouter = Express.Router();
 const upload = multer();
 
-FilesRouter.post(
-  "/upload/multiple",
-  upload.array("files"),
-  controller.uploadFiles
-);
+FilesRouter.post("/upload/multiple", controller.uploadFiles);
 
 FilesRouter.post("/upload/test", controller.testUpload);
 
