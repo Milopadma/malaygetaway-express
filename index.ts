@@ -16,9 +16,19 @@ import FilesRouter from "./api/files/files.routes";
 import CreditCardRouter from "./api/purchase/paymentMethod/creditCard/creditCard.routes";
 import PayPalRouter from "./api/purchase/paymentMethod/payPal/payPal.routes";
 import FormReviewRouter from "./api/review/formReview.routes";
+import { checkKeys } from "./helpers/utils";
 
 const app = express();
 dotenv.config();
+app.use(express.json());
+app.use(cors());
+export const utapi = new UTApi({
+  apiKey: process.env.UPLOADTHING_SECRET,
+});
+// key checks
+checkKeys();
+// mongodb connection
+checkConnection();
 
 app.use(function (
   req: any,
@@ -38,31 +48,10 @@ const corsOption = {
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS", // Include 'OPTIONS'
   credentials: true,
 };
-app.use(cors(corsOption));
+app.use(express.urlencoded({ extended: false }));
 
 // Enable pre-flight across the board
 app.options("*", cors(corsOption));
-
-app.use(express.json());
-
-if (!process.env.JWT_SECRET_KEY) {
-  console.error("JWT secret not found!");
-  process.exit(1);
-}
-if (!process.env.RESEND_API_KEY) {
-  console.error("RESEND Secret key not found!");
-  process.exit(1);
-}
-
-// this was causing crashes
-// app.use(
-//   session({
-//     secret: String(process.env.SESSION_SECRET),
-//     resave: false,
-//     saveUninitialized: true,
-//     cookie: { secure: false }, // Set secure to true for HTTPS
-//   })
-// );
 
 // Logging Middleware for Debugging
 app.use((req, res, next) => {
@@ -78,24 +67,9 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.urlencoded({ extended: false }));
-
-// mongodb connection
-checkConnection();
-
-// external provider for file hosting
-if (!process.env.UPLOADTHING_SECRET) {
-  console.error("Uploadthing secret not found");
-  process.exit(1);
-}
-export const utapi = new UTApi({
-  apiKey: process.env.UPLOADTHING_SECRET,
+app.get("/api/hello", (req, res) => {
+  res.send("Hello World!");
 });
-if (utapi) {
-  console.log("📁 UTApi Connected ✅");
-} else {
-  console.error("UTApi connection error");
-}
 
 // Mylo's endpoints
 app.use("/api/auth", AuthRouter);

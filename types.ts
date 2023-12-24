@@ -29,8 +29,11 @@ export enum MerchantStatus {
 
 export interface MerchantData {
   merchantId: number;
-  phoneNumber: number;
-  email: string;
+  name: string;
+  contactNumber: number;
+  contactEmail: string;
+  description: string;
+  businessFileURLs: string[];
   status: MerchantStatus;
 }
 

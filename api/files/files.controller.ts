@@ -9,7 +9,7 @@ export class FilesController {
     }
 
     console.log("1. Received files from FE", req.files);
-    const files = req.files as Express.Multer.File[];
+    const files = req.files;
 
     try {
       // save these files to the uploads folder
@@ -19,7 +19,7 @@ export class FilesController {
       } else {
         try {
           const filePaths = files.map(
-            (file) => `./uploads/${file.originalname}`
+            (file: { originalname: any }) => `./uploads/${file.originalname}`
           );
           const response = await sendFiles(filePaths);
           //   res.json({ message: "sendFiles: Data Received", response });
