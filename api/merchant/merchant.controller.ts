@@ -184,4 +184,56 @@ export class MerchantController {
       sendInternalError(res, error);
     }
   }
+
+  async checkMerchantName(req: { params: { name: string } }, res: any) {
+    try {
+      const { name: username } = req.params;
+      const isUsernameExist = await userModel.findOne({
+        "data.data.name": username,
+      });
+      if (isUsernameExist) {
+        console.log("isUsernameExist", isUsernameExist);
+        sendConflict(res, "Username already exists");
+      } else {
+        console.log("isUsernameExist", isUsernameExist);
+        sendSuccess(res, { data: { username } });
+      }
+    } catch (error) {
+      sendInternalError(res, error);
+    }
+  }
+
+  async checkEmail(req: { params: { email: string } }, res: any) {
+    try {
+      const { email } = req.params;
+      const isEmailExist = await userModel.findOne({
+        "data.type": "merchant",
+        "data.data.email": email,
+      });
+      if (isEmailExist) {
+        sendConflict(res, "Email already exists");
+      } else {
+        sendSuccess(res, { data: { email } });
+      }
+    } catch (error) {
+      sendInternalError(res, error);
+    }
+  }
+
+  async checkNumber(req: { params: { contactNumber: number } }, res: any) {
+    try {
+      const { contactNumber } = req.params;
+      const isPhoneNumberExist = await userModel.findOne({
+        "data.type": "merchant",
+        "data.data.contactNumber": contactNumber,
+      });
+      if (isPhoneNumberExist) {
+        sendConflict(res, "Phone number already exists");
+      } else {
+        sendSuccess(res, { data: { contactNumber } });
+      }
+    } catch (error) {
+      sendInternalError(res, error);
+    }
+  }
 }
