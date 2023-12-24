@@ -12,11 +12,14 @@ import AuthRouter from "./api/auth/auth.routes";
 // Adit
 import PersonalDetailRouter from "./api/purchase/personalDetail/personalDetail.routes";
 import BillingAddressRouter from "./api/purchase/billingAddress/billingAddress.routes";
-import FilesRouter from "./api/files/files.routes";
+// import FilesRouter from "./api/files/files.routes";
 import CreditCardRouter from "./api/purchase/paymentMethod/creditCard/creditCard.routes";
 import PayPalRouter from "./api/purchase/paymentMethod/payPal/payPal.routes";
 import FormReviewRouter from "./api/review/formReview.routes";
 import { checkKeys } from "./helpers/utils";
+import formidable from "formidable";
+import fs from "fs";
+import path from "path";
 
 const app = express();
 dotenv.config();
@@ -74,7 +77,23 @@ app.get("/api/hello", (req, res) => {
 // Mylo's endpoints
 app.use("/api/auth", AuthRouter);
 app.use("/api/merchant", MerchantRouter);
-app.use("/api/files", FilesRouter);
+// ---------------------------------------------------------------
+app.post("/api/files/upload", (req, res) => {
+  const form = formidable({
+    uploadDir: path.join(import.meta.dir, "uploads"),
+    keepExtensions: true,
+  });
+
+  form.parse(req, (err, fields, files) => {
+    if (err) {
+      console.error("Error", err);
+      throw err;
+    }
+    console.log("Fields", fields);
+    console.log("Files", files);
+    res.json({ fields, files });
+  });
+});
 
 // Adit
 app.use("/api/purchase/personalDetail", PersonalDetailRouter);
