@@ -208,7 +208,7 @@ export class MerchantController {
       const { email } = req.params;
       const isEmailExist = await userModel.findOne({
         "data.type": "merchant",
-        "data.data.email": email,
+        "data.data.contactEmail": email,
       });
       if (isEmailExist) {
         sendConflict(res, "Email already exists");
