@@ -97,14 +97,6 @@ if (utapi) {
   console.error("UTApi connection error");
 }
 
-// app.get("/", (req: any, res: { redirect: (arg0: string) => void }) => {
-//   res.redirect("http://localhost:3003");
-// });
-
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
-
 // Mylo's endpoints
 app.use("/api/auth", AuthRouter);
 app.use("/api/merchant", MerchantRouter);
