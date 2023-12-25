@@ -5,6 +5,7 @@ import {
   User,
   MerchantStatus,
   MerchantDataResponse,
+  Product,
 } from "../../types";
 import { Response } from "express";
 import businessModel from "../../model/business/business.model";
@@ -243,6 +244,134 @@ export class MerchantController {
         sendConflict(res, "Phone number already exists");
       } else {
         sendSuccess(res, { data: { contactNumber } });
+      }
+    } catch (error) {
+      sendInternalError(res, error);
+    }
+  }
+
+  // products related
+  async getProducts(req: { params: { merchantId: number } }, res: any) {
+    try {
+      const { merchantId } = req.params;
+      const merchant = await userModel.findOne({
+        "data.type": "merchant",
+        "data.data.merchantId": merchantId,
+      });
+      if (!merchant) {
+        sendNotFound(res, "Merchant not found");
+      } else {
+        const merchantData = merchant.data.data as MerchantData;
+        sendSuccess(res, { data: merchantData.products });
+      }
+    } catch (error) {
+      sendInternalError(res, error);
+    }
+  }
+
+  async getSingleProduct(req: { params: { productId: number } }, res: any) {
+    try {
+      const { productId } = req.params;
+      const merchant = await userModel.findOne({
+        "data.type": "merchant",
+        "data.data.products.productId": productId,
+      });
+      if (!merchant) {
+        sendNotFound(res, "Product not found");
+      } else {
+        const merchantData = merchant.data.data as MerchantData;
+        const product = merchantData.products.find(
+          (product) => product.productId === productId
+        );
+        sendSuccess(res, { data: product });
+      }
+    } catch (error) {
+      sendInternalError(res, error);
+    }
+  }
+
+  async addProduct(
+    req: { params: { merchantId: number }; body: { product: Product } },
+    res: any
+  ) {
+    try {
+      const { merchantId } = req.params;
+      const { product } = req.body;
+      const merchant = await userModel.findOne({
+        "data.type": "merchant",
+        "data.data.merchantId": merchantId,
+      });
+      if (!merchant) {
+        sendNotFound(res, "Merchant not found");
+      } else {
+        const merchantData = merchant.data.data as MerchantData;
+        merchantData.products.push(product);
+        await merchant.save();
+        sendSuccess(res, { data: merchantData.products });
+      }
+    } catch (error) {
+      sendInternalError(res, error);
+    }
+  }
+
+  async updateProduct(
+    req: {
+      params: { merchantId: number; productId: number };
+      body: { product: Product };
+    },
+    res: any
+  ) {
+    try {
+      const { merchantId, productId } = req.params;
+      const { product } = req.body;
+      const merchant = await userModel.findOne({
+        "data.type": "merchant",
+        "data.data.merchantId": merchantId,
+      });
+      if (!merchant) {
+        sendNotFound(res, "Merchant not found");
+      } else {
+        const merchantData = merchant.data.data as MerchantData;
+        const productIndex = merchantData.products.findIndex(
+          (product) => product.productId === productId
+        );
+        if (productIndex === -1) {
+          sendNotFound(res, "Product not found");
+        } else {
+          merchantData.products[productIndex] = product;
+          await merchant.save();
+          sendSuccess(res, { data: merchantData.products });
+        }
+      }
+    } catch (error) {
+      sendInternalError(res, error);
+    }
+  }
+
+  async deleteProduct(
+    req: { params: { merchantId: number; productId: number } },
+    res: any
+  ) {
+    try {
+      const { merchantId, productId } = req.params;
+      const merchant = await userModel.findOne({
+        "data.type": "merchant",
+        "data.data.merchantId": merchantId,
+      });
+      if (!merchant) {
+        sendNotFound(res, "Merchant not found");
+      } else {
+        const merchantData = merchant.data.data as MerchantData;
+        const productIndex = merchantData.products.findIndex(
+          (product) => product.productId === productId
+        );
+        if (productIndex === -1) {
+          sendNotFound(res, "Product not found");
+        } else {
+          merchantData.products.splice(productIndex, 1);
+          await merchant.save();
+          sendSuccess(res, { data: merchantData.products });
+        }
       }
     } catch (error) {
       sendInternalError(res, error);
