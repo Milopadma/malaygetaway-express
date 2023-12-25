@@ -12,12 +12,10 @@ import AuthRouter from "./api/auth/auth.routes";
 // Adit
 import PersonalDetailRouter from "./api/purchase/personalDetail/personalDetail.routes";
 import BillingAddressRouter from "./api/purchase/billingAddress/billingAddress.routes";
-import FilesRouter from "./api/files/files.routes";
 import PayPalRouter from "./api/purchase/paymentMethod/payPal/payPal.routes";
 import FormReviewRouter from "./api/review/formReview.routes";
 import { checkKeys, sendFiles } from "./helpers/utils";
 import formidable from "formidable";
-import fs from "fs";
 import path from "path";
 import { FilesController } from "./api/files/files.controller";
 
@@ -67,7 +65,7 @@ app.use((req, res, next) => {
   console.log(`URL     : ${req.url}`);
 
   // Cetak isi body request untuk metode POST, PUT, dan PATCH
-  if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
+  if (["POST", "PUT", "PATCH"].includes(req.method)) {
     console.log(`Body    : ${JSON.stringify(req.body, null, 2)}`);
   }
   console.log(`Body    : ${JSON.stringify(req.body)}`);
