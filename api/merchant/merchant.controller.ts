@@ -4,6 +4,7 @@ import {
   UserType,
   User,
   MerchantStatus,
+  MerchantDataResponse,
 } from "../../types";
 import { Response } from "express";
 import businessModel from "../../model/business/business.model";
@@ -105,8 +106,15 @@ export class MerchantController {
 
   async getMerchants(req: any, res: Response) {
     try {
-      const merchants = await userModel.find({ "data.type": "merchant" });
-      sendSuccess(res, { data: merchants });
+      const users = await userModel.find({ "data.type": "merchant" });
+      const merchants = users.map((user) => user.data.data) as MerchantData[];
+      const response: MerchantDataResponse = {
+        status: "success",
+        code: 200,
+        data: merchants,
+        message: "Merchants retrieved successfully",
+      };
+      sendSuccess(res, response);
     } catch (error) {
       sendInternalError(res, error);
     }

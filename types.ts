@@ -6,6 +6,13 @@ export enum UserType {
   MINISTRY_OFFICER = "ministry_officer",
 }
 
+export interface MerchantDataResponse {
+  status: string;
+  code: number;
+  data: MerchantData[];
+  message: string;
+}
+
 // login types
 export interface User<UserTypeData> {
   userId: number;

@@ -36,7 +36,23 @@ export class AuthController {
         .setExpirationTime("2h")
         .sign(secret);
 
-      res.json({ success: true, token: token });
+      res.json({ success: true, token: token, role: user.data.type });
+    } catch (error) {
+      sendInternalError(res, error);
+    }
+  }
+
+  async usertype(req: Request, res: Response) {
+    try {
+      const { username } = req.params;
+
+      const user = await userModel.findOne({ username: username });
+      if (!user) {
+        res.status(404).json({ success: false, message: "User not found" });
+        return;
+      }
+
+      res.json({ success: true, userType: user.data.type });
     } catch (error) {
       sendInternalError(res, error);
     }
