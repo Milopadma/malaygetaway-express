@@ -19,13 +19,10 @@ MerchantRouter.get(
 );
 
 // products
-MerchantRouter.post("/getProducts/:merchantId", controller.getProducts);
-MerchantRouter.post(
-  "/getSingleProduct/:productId",
-  controller.getSingleProduct
-);
-MerchantRouter.post("/addProduct/:merchantId", controller.addProduct);
-MerchantRouter.post("/updateProduct/:productId", controller.updateProduct);
-MerchantRouter.post("/deleteProduct/:productId", controller.deleteProduct);
+MerchantRouter.get("/getProducts/:merchantId", controller.getProducts);
+MerchantRouter.get("/getSingleProduct/:productId", controller.getSingleProduct);
+MerchantRouter.post("/addProduct", controller.addProduct);
+MerchantRouter.patch("/updateProduct/:productId", controller.updateProduct);
+MerchantRouter.delete("/deleteProduct/:productId", controller.deleteProduct);
 
 export default MerchantRouter;

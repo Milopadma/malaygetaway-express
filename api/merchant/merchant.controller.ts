@@ -290,26 +290,37 @@ export class MerchantController {
     }
   }
 
-  async addProduct(
-    req: { params: { merchantId: number }; body: { product: Product } },
-    res: any
-  ) {
+  async addProduct(req: { body: { product: Product } }, res: any) {
     try {
-      const { merchantId } = req.params;
       const { product } = req.body;
+
+      if (!product) {
+        res
+          .status(400)
+          .json({ success: false, message: "Product data is required" });
+        return;
+      }
+
+      console.log("product:", product);
+      console.log("product.merchantid:", product.merchantId);
+
       const merchant = await userModel.findOne({
         "data.type": "merchant",
-        "data.data.merchantId": merchantId,
+        "data.data.merchantId": product.merchantId,
       });
+      console.log("merchant:", merchant);
+
       if (!merchant) {
         sendNotFound(res, "Merchant not found");
       } else {
         const merchantData = merchant.data.data as MerchantData;
         merchantData.products.push(product);
         await merchant.save();
+        console.log("merchantData.products:", merchantData.products);
         sendSuccess(res, { data: merchantData.products });
       }
     } catch (error) {
+      console.log("error:", error);
       sendInternalError(res, error);
     }
   }

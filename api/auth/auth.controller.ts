@@ -92,6 +92,28 @@ export class AuthController {
       sendInternalError(res, error);
     }
   }
+
+  async getMerchantId(req: Request, res: Response) {
+    try {
+      const { username } = req.params;
+      const user = await userModel.findOne({
+        $or: [{ username: username }],
+      });
+      if (!user) {
+        res.status(404).json({ success: false, message: "User not found" });
+        return;
+      }
+
+      let merchantId;
+      if (user.data.type === "merchant") {
+        merchantId = user.data.data.merchantId;
+      }
+
+      res.json({ success: true, userId: merchantId });
+    } catch (error) {
+      sendInternalError(res, error);
+    }
+  }
 }
 
 export default AuthController;

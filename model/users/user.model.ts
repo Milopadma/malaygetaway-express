@@ -22,7 +22,6 @@ const userSchema = new Schema<
     type: { type: String, required: true },
     data: {
       // if its a merchant type
-
       merchantId: { type: Number, required: true, unique: true },
       name: { type: String, required: true },
       contactNumber: { type: Number, required: true },
@@ -30,6 +29,20 @@ const userSchema = new Schema<
       description: { type: String, required: true },
       businessFileURLs: { type: [String], required: true },
       status: { type: String, required: true },
+      products: {
+        type: [
+          {
+            productId: { type: Number, required: true },
+            name: { type: String, required: true },
+            description: { type: String, required: true },
+            price: { type: Number, required: true },
+            type: { type: String, required: true },
+            productImageURLs: { type: [String], required: true },
+            merchantId: { type: Number, required: true },
+          },
+        ],
+        required: true,
+      },
     } || {
         // if its a customer type
         customerId: { type: Number, required: true, unique: true },
