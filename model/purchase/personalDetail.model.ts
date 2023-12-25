@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 const personalDetailSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   address: { type: String, required: true },
@@ -10,4 +11,4 @@ const personalDetailSchema = new mongoose.Schema({
   postalCode: { type: String, required: true },
 });
 
-export default mongoose.model("personalDetail", personalDetailSchema);
+export default mongoose.model("PersonalDetail", personalDetailSchema);

@@ -15,9 +15,43 @@ import BillingAddressRouter from "./api/purchase/billingAddress/billingAddress.r
 import FilesRouter from "./api/files/files.routes";
 import PayPalRouter from "./api/purchase/paymentMethod/payPal/payPal.routes";
 import FormReviewRouter from "./api/review/formReview.routes";
+import ReceiptRouter from "./api/receipt/receipt.routes";
+import { PersonalDetailController } from './api/purchase/personalDetail/personalDetail.controller';
+import { BillingAddressController } from './api/purchase/billingAddress/billingAddress.controller';
+import { PayPalController } from './api/purchase/paymentMethod/payPal/payPal.controller';
+import { ReceiptController } from './api/receipt/receipt.controller';
 
 const app = express();
 dotenv.config();
+
+// Get all detail of purchase and send to receipt
+const personalDetailController = new PersonalDetailController();
+const billingAddressController = new BillingAddressController();
+const payPalController = new PayPalController();
+
+app.get('/api/receipt/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const personalDetail = await personalDetailController.getPersonalDetailById({ params: { id: userId } }, res);
+    const billingAddress = await billingAddressController.getBillingAddressById({ params: { id: userId } }, res);
+    const payPal = await payPalController.getPayPalById({ params: { id: userId } }, res);
+
+    const receiptData = {
+      personalDetail,
+      billingAddress,
+      payPal
+    };
+
+    res.json(receiptData);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).send(error.message);
+    } else {
+      res.status(500).send('Unknown error occurred');
+    }
+  }
+});
+
 
 app.use(function (
   req: any,
@@ -73,7 +107,6 @@ app.use((req, res, next) => {
   console.log(`Method  : ${req.method}`);
   console.log(`URL     : ${req.url}`);
 
-  // Cetak isi body request untuk metode POST, PUT, dan PATCH
   if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
     console.log(`Body    : ${JSON.stringify(req.body, null, 2)}`);
   }
@@ -108,16 +141,17 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-// Mylo's endpoints
+// Mylo's Endpoints
 app.use("/api/auth", AuthRouter);
 app.use("/api/merchant", MerchantRouter);
 app.use("/api/files", FilesRouter);
 
-// Adit
+// Adit's Endpoints
 app.use("/api/purchase/personalDetail", PersonalDetailRouter);
 app.use("/api/purchase/billingAddress", BillingAddressRouter);
 app.use("/api/purchase/paymentMethod/payPal", PayPalRouter);
 app.use("/api/review/formReview", FormReviewRouter);
+app.use("/api/receipt/receipt", ReceiptRouter);
 
 // Test Server Running
 const port = process.env.PORT || 8080;

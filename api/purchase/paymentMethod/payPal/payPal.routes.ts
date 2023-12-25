@@ -9,5 +9,6 @@ PayPalRouter.get('/get/:id', controller.getPayPalById);
 PayPalRouter.post('/create', controller.createPayPal);
 PayPalRouter.put('/update/:id', controller.updatePayPal);
 PayPalRouter.delete('/delete/:id', controller.deletePayPal);
+PayPalRouter.post('/create-order', controller.createOrder);
 
 export default PayPalRouter;
