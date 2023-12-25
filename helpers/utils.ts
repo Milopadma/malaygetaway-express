@@ -92,16 +92,17 @@ export async function sendFiles(files: string[]): Promise<any[]> {
     const response = await utapi.uploadFiles(fileData);
     console.log("5. Sending...");
     console.log("6. Files sent to utapi!", response);
+    // purge local cache of files
+    files.forEach((file) => {
+      if (fs.existsSync(file)) {
+        fs.unlinkSync(file);
+      }
+    });
     return response;
   });
 
   // Wait for all promises to resolve
   const responses = await Promise.all(promises);
-
-  // purge local cache of files
-  // files.forEach((file) => {
-  //   fs.unlinkSync(file);
-  // });
 
   return responses;
 }
