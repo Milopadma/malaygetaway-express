@@ -1,17 +1,12 @@
-import Express from "express";
-import { FilesController } from "./files.controller";
-import multer from "multer";
+// import Express from "express";
+// import { FilesController } from "./files.controller";
+// import { validateFormData } from "./files.middleware";
 
-const controller = new FilesController();
-const FilesRouter = Express.Router();
-const upload = multer();
+// const controller = new FilesController();
+// const FilesRouter = Express.Router();
 
-FilesRouter.post(
-  "/upload/multiple",
-  upload.array("files"),
-  controller.uploadFiles
-);
+// // FilesRouter.post("/upload/multiple", validateFormData, controller.uploadFiles);
 
-FilesRouter.post("/upload/test", controller.testUpload);
+// // FilesRouter.post("/upload/test", controller.testUpload);
 
-export default FilesRouter;
+// export default FilesRouter;

@@ -10,10 +10,18 @@ export class AuthController {
   async login(req: Request, res: Response) {
     try {
       const { username, password } = req.body;
+      console.log("username", username);
 
-      const user = await userModel.findOne({ username: username });
+      const user = await userModel.findOne({
+        $or: [
+          { username: username },
+          { "data.type": "merchant", "data.data.contactEmail": username },
+        ],
+      });
       if (!user) {
-        res.status(401).json({ success: false, message: "Invalid username" });
+        res
+          .status(401)
+          .json({ success: false, message: "Invalid username or email" });
         return;
       }
 
@@ -36,7 +44,50 @@ export class AuthController {
         .setExpirationTime("2h")
         .sign(secret);
 
-      res.json({ success: true, token: token });
+      res.json({ success: true, token: token, role: user.data.type });
+    } catch (error) {
+      sendInternalError(res, error);
+    }
+  }
+
+  async usertype(req: Request, res: Response) {
+    try {
+      const { username } = req.params;
+
+      const user = await userModel.findOne({ username: username });
+      if (!user) {
+        res.status(404).json({ success: false, message: "User not found" });
+        return;
+      }
+
+      res.json({ success: true, userType: user.data.type });
+    } catch (error) {
+      sendInternalError(res, error);
+    }
+  }
+
+  async checkUsername(req: Request, res: Response) {
+    try {
+      const { username } = req.params;
+      console.log("username", username);
+
+      const user = await userModel.findOne({
+        $or: [
+          { username: username },
+          { "data.type": "merchant", "data.data.contactEmail": username },
+        ],
+      });
+      if (user) {
+        res.json({
+          success: true,
+          message: "Username or email already exists",
+        });
+      } else {
+        res.json({
+          success: false,
+          message: "Username and email are available",
+        });
+      }
     } catch (error) {
       sendInternalError(res, error);
     }

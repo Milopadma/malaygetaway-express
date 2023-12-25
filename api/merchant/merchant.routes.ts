@@ -10,4 +10,12 @@ MerchantRouter.get("/get/:merchantId", controller.getMerchantById);
 MerchantRouter.post("/update/:merchantId", controller.updateMerchantData);
 MerchantRouter.post("/setStatus/:merchantId", controller.setMerchantStatus);
 
+// checks
+MerchantRouter.get("/check/name/:name", controller.checkMerchantName);
+MerchantRouter.get("/check/email/:email", controller.checkEmail);
+MerchantRouter.get(
+  "/check/contactNumber/:contactNumber",
+  controller.checkNumber
+);
+
 export default MerchantRouter;

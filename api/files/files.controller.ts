@@ -9,7 +9,7 @@ export class FilesController {
     }
 
     console.log("1. Received files from FE", req.files);
-    const files = req.files as Express.Multer.File[];
+    const files = req.files;
 
     try {
       // save these files to the uploads folder
@@ -19,7 +19,7 @@ export class FilesController {
       } else {
         try {
           const filePaths = files.map(
-            (file) => `./uploads/${file.originalname}`
+            (file: { originalname: any }) => `./uploads/${file.originalname}`
           );
           const response = await sendFiles(filePaths);
           //   res.json({ message: "sendFiles: Data Received", response });
@@ -34,6 +34,18 @@ export class FilesController {
       sendSuccess(res, { data: req.file });
     } catch (error) {
       console.log("error", error);
+      sendInternalError(res, error);
+    }
+  }
+
+  async sendFiles(req: any, res: any) {
+    console.log("1. Received files from FE");
+    try {
+      const paths = req.filePaths;
+      const data = await sendFiles(paths); // Wait for sendFiles to finish
+      sendSuccess(res, { data });
+    } catch (error) {
+      console.error(error);
       sendInternalError(res, error);
     }
   }
