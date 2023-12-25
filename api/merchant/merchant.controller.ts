@@ -271,7 +271,7 @@ export class MerchantController {
 
   async getSingleProduct(req: { params: { productId: number } }, res: any) {
     try {
-      const { productId } = req.params;
+      const productId = Number(req.params.productId);
       const merchant = await userModel.findOne({
         "data.type": "merchant",
         "data.data.products.productId": productId,
@@ -280,9 +280,13 @@ export class MerchantController {
         sendNotFound(res, "Product not found");
       } else {
         const merchantData = merchant.data.data as MerchantData;
+        console.log("merchantData.products:", merchantData.products);
         const product = merchantData.products.find(
           (product) => product.productId === productId
         );
+        if (!product) {
+          sendNotFound(res, "Product not found");
+        }
         sendSuccess(res, { data: product });
       }
     } catch (error) {
@@ -327,30 +331,40 @@ export class MerchantController {
 
   async updateProduct(
     req: {
-      params: { merchantId: number; productId: number };
+      params: { productId: number };
       body: { product: Product };
     },
     res: any
   ) {
     try {
-      const { merchantId, productId } = req.params;
+      const productId = Number(req.params.productId);
       const { product } = req.body;
+      console.log("productId:", productId);
+      console.log("product:", product);
       const merchant = await userModel.findOne({
         "data.type": "merchant",
-        "data.data.merchantId": merchantId,
+        "data.data.products.productId": productId,
       });
+      console.log("merchant:", merchant);
       if (!merchant) {
         sendNotFound(res, "Merchant not found");
       } else {
         const merchantData = merchant.data.data as MerchantData;
-        const productIndex = merchantData.products.findIndex(
+        const productToUpdate = merchantData.products.find(
           (product) => product.productId === productId
         );
-        if (productIndex === -1) {
+        console.log("product:", product);
+        if (!productToUpdate) {
           sendNotFound(res, "Product not found");
         } else {
-          merchantData.products[productIndex] = product;
+          productToUpdate.name = product.name;
+          productToUpdate.description = product.description;
+          productToUpdate.price = product.price;
+          productToUpdate.productImageURLs = product.productImageURLs;
+          productToUpdate.type = product.type;
+
           await merchant.save();
+          console.log("merchantData.products:", merchantData.products);
           sendSuccess(res, { data: merchantData.products });
         }
       }
