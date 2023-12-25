@@ -6,5 +6,6 @@ const AuthRouter = Express.Router();
 
 AuthRouter.post("/login", controller.login);
 AuthRouter.get("/usertype/:username", controller.usertype);
+AuthRouter.get("/check/username/:username", controller.checkUsername);
 
 export default AuthRouter;

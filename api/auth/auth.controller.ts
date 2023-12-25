@@ -65,6 +65,33 @@ export class AuthController {
       sendInternalError(res, error);
     }
   }
+
+  async checkUsername(req: Request, res: Response) {
+    try {
+      const { username } = req.params;
+      console.log("username", username);
+
+      const user = await userModel.findOne({
+        $or: [
+          { username: username },
+          { "data.type": "merchant", "data.data.contactEmail": username },
+        ],
+      });
+      if (user) {
+        res.json({
+          success: true,
+          message: "Username or email already exists",
+        });
+      } else {
+        res.json({
+          success: false,
+          message: "Username and email are available",
+        });
+      }
+    } catch (error) {
+      sendInternalError(res, error);
+    }
+  }
 }
 
 export default AuthController;
