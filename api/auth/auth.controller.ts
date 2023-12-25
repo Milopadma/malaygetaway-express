@@ -10,10 +10,18 @@ export class AuthController {
   async login(req: Request, res: Response) {
     try {
       const { username, password } = req.body;
+      console.log("username", username);
 
-      const user = await userModel.findOne({ username: username });
+      const user = await userModel.findOne({
+        $or: [
+          { username: username },
+          { "data.type": "merchant", "data.data.contactEmail": username },
+        ],
+      });
       if (!user) {
-        res.status(401).json({ success: false, message: "Invalid username" });
+        res
+          .status(401)
+          .json({ success: false, message: "Invalid username or email" });
         return;
       }
 

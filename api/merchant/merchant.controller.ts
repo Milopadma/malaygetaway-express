@@ -183,7 +183,7 @@ export class MerchantController {
           <h1>Congratulations!</h1>
           <div>Your account has been created.</div>
           <div> Your username is <strong>${
-            merchantUpdated.username
+            (merchantUpdated.data.data as MerchantData).contactEmail
           }</strong> and your password is 
           <strong>${"pw" + merchantUpdated.username}</strong></div>
           <div>Explore malaysia now! <a href="https://malaygetaway-angular.milopadma.com/login">malaygetaway-angular.milopadma.com</a></div>
