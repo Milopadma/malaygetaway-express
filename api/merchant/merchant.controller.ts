@@ -373,27 +373,27 @@ export class MerchantController {
     }
   }
 
-  async deleteProduct(
-    req: { params: { merchantId: number; productId: number } },
-    res: any
-  ) {
+  async deleteProduct(req: { params: { productId: number } }, res: any) {
     try {
-      const { merchantId, productId } = req.params;
+      const productId = Number(req.params.productId);
       const merchant = await userModel.findOne({
         "data.type": "merchant",
-        "data.data.merchantId": merchantId,
+        "data.data.products.productId": productId,
       });
       if (!merchant) {
         sendNotFound(res, "Merchant not found");
       } else {
         const merchantData = merchant.data.data as MerchantData;
-        const productIndex = merchantData.products.findIndex(
+        const productToDelete = merchantData.products.find(
           (product) => product.productId === productId
         );
-        if (productIndex === -1) {
+        console.log("product:", productToDelete);
+        if (!productToDelete) {
           sendNotFound(res, "Product not found");
         } else {
-          merchantData.products.splice(productIndex, 1);
+          merchantData.products = merchantData.products.filter(
+            (product) => product.productId !== productId
+          );
           await merchant.save();
           sendSuccess(res, { data: merchantData.products });
         }
