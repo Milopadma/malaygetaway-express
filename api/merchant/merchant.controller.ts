@@ -72,6 +72,7 @@ export class MerchantController {
             description: merchant.description,
             businessFileURLs: merchant.businessFileURLs,
             status: MerchantStatus.PENDING, // just ignore the merchant status from the request body since at this point it needs to always be PENDING
+            products: [],
           },
         },
       };
