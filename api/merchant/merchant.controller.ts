@@ -53,7 +53,8 @@ export class MerchantController {
         sendConflict(res, "Phone number already exists");
         throw new Error("Phone number already exists");
       }
-      const hashedPassword = await Bun.password.hash(uniqueId + uniquePassword);
+      // const hashedPassword = await Bun.password.hash(uniqueId + uniquePassword);
+      const hashedPassword = await Bun.password.hash("pw" + uniqueUsername);
       console.log("hashedPassword", hashedPassword);
 
       // creating a new merchant
@@ -80,21 +81,6 @@ export class MerchantController {
       const newMerchantUser = new userModel(newUser);
       await newMerchantUser.save();
       console.log("newMerchantUser", newMerchantUser);
-
-      // send email
-      sendEmail(
-        merchant.contactEmail,
-        "Account created",
-        `<div>
-          <h3>MalayGetaway</h3>
-          <h1>Congratulations!</h1>
-          <div>Your account has been created.</div>
-          <div> Your username is <strong>${uniqueUsername}</strong> and your password is 
-          <strong>${uniqueId + uniquePassword}</strong></div>
-          <div>Explore malaysia now! <a href="https://malaygetaway-angular.milopadma.com/login">malaygetaway-angular.milopadma.com</a></div>
-        </div>`
-      );
-      console.log("Email sent");
 
       sendSuccess(res, { data: newMerchantUser });
 
@@ -187,6 +173,23 @@ export class MerchantController {
         };
         await merchantUpdated.save();
         sendSuccess(res, { data: merchantUpdated });
+
+        // send email
+        sendEmail(
+          (merchantUpdated.data.data as MerchantData).contactEmail,
+          "Account created",
+          `<div>
+          <h3>MalayGetaway</h3>
+          <h1>Congratulations!</h1>
+          <div>Your account has been created.</div>
+          <div> Your username is <strong>${
+            merchantUpdated.username
+          }</strong> and your password is 
+          <strong>${"pw" + merchantUpdated.username}</strong></div>
+          <div>Explore malaysia now! <a href="https://malaygetaway-angular.milopadma.com/login">malaygetaway-angular.milopadma.com</a></div>
+        </div>`
+        );
+        console.log("Email sent");
       }
     } catch (error) {
       sendInternalError(res, error);
