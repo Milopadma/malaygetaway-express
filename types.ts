@@ -42,6 +42,17 @@ export interface MerchantData {
   description: string;
   businessFileURLs: string[];
   status: MerchantStatus;
+  products: Product[];
+}
+
+export interface Product {
+  productId: number;
+  name: string;
+  description: string;
+  price: number;
+  type: string;
+  productImageURLs: string[];
+  merchantId: number;
 }
 
 // Customer related interface types

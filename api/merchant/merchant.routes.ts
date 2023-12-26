@@ -18,4 +18,11 @@ MerchantRouter.get(
   controller.checkNumber
 );
 
+// products
+MerchantRouter.get("/getProducts/:merchantId", controller.getProducts);
+MerchantRouter.get("/getSingleProduct/:productId", controller.getSingleProduct);
+MerchantRouter.post("/addProduct", controller.addProduct);
+MerchantRouter.patch("/updateProduct/:productId", controller.updateProduct);
+MerchantRouter.delete("/deleteProduct/:productId", controller.deleteProduct);
+
 export default MerchantRouter;
