@@ -130,7 +130,7 @@ export class MerchantController {
     res: any
   ) {
     try {
-      const { merchantId } = req.params;
+      const merchantId = Number(req.params.merchantId);
       const { merchant } = req.body;
       const merchantUpdated = await userModel.findOne({
         "data.type": "merchant",
