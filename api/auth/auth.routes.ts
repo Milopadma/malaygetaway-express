@@ -10,7 +10,8 @@ AuthRouter.get("/check/username/:username", controller.checkUsername);
 AuthRouter.get("/getMerchantId/:username", controller.getMerchantId);
 
 AuthRouter.get("/getUsers", controller.getUsers);
-AuthRouter.get("/getUser/:userId", controller.getUserById);
+AuthRouter.get("/getUserById/:userId", controller.getUserById);
+AuthRouter.get("/getUserByEmail/:email", controller.getUserIdByEmail);
 
 // change password
 AuthRouter.post("/changePassword", controller.changePassword);

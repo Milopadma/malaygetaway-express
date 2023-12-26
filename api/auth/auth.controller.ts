@@ -180,6 +180,24 @@ export class AuthController {
       sendInternalError(res, error);
     }
   }
+
+  async getUserIdByEmail(req: Request, res: Response) {
+    try {
+      const { email } = req.params;
+      const user = await userModel.findOne({
+        "data.type": "merchant",
+        "data.data.contactEmail": email,
+      });
+      if (!user) {
+        sendNotFound(res, "User not found");
+      } else {
+        sendSuccess(res, { data: user.userId });
+      }
+    } catch (error) {
+      console.error("An error occurred while retrieving the user:", error);
+      sendInternalError(res, error);
+    }
+  }
 }
 
 export default AuthController;
