@@ -101,7 +101,7 @@ export class AuthController {
     try {
       const { username } = req.params;
       const user = await userModel.findOne({
-        $or: [{ username: username }],
+        $or: [{ username: username }, { "data.data.contactEmail": username }],
       });
       if (!user) {
         res.status(404).json({ success: false, message: "User not found" });
@@ -121,10 +121,11 @@ export class AuthController {
 
   async changePassword(req: Request, res: Response) {
     try {
-      const { userId, oldPassword, newPassword } = req.body;
+      const { oldPassword, newPassword } = req.body;
 
       // Retrieve the user from the database
-      const user = await userModel.findById(userId);
+      const userId = Number(req.body.userId);
+      const user = await userModel.findOne({ userId });
       if (!user) {
         return res
           .status(404)
@@ -141,8 +142,10 @@ export class AuthController {
 
       // Hash the new password and update the user's password in the database
       const hashedPassword = await Bun.password.hash(newPassword);
-      user.password = hashedPassword;
-      await user.save();
+      await userModel.updateOne(
+        { userId },
+        { $set: { password: hashedPassword } }
+      );
 
       res.json({ success: true, message: "Password changed successfully" });
     } catch (error) {
