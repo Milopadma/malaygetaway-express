@@ -29,9 +29,9 @@ const personalDetailController = new PersonalDetailController();
 const billingAddressController = new BillingAddressController();
 const payPalController = new PayPalController();
 
-app.get('/api/receipt/:userId', async (req, res) => {
+app.get('/api/receipt/get/:id', async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const userId = req.params.id;
     const personalDetail = await personalDetailController.getPersonalDetailById({ params: { id: userId } }, res);
     const billingAddress = await billingAddressController.getBillingAddressById({ params: { id: userId } }, res);
     const payPal = await payPalController.getPayPalById({ params: { id: userId } }, res);
@@ -53,16 +53,13 @@ app.get('/api/receipt/:userId', async (req, res) => {
 });
 
 
-app.use(function (
-  req: any,
-  res: { header: (arg0: string, arg1: string) => void },
-  next: () => void
-) {
+app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
     "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
   );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   next();
 });
 

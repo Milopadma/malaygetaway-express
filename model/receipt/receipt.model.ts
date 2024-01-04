@@ -2,27 +2,9 @@ import mongoose from 'mongoose';
 
 const receiptSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  personalDetail: {
-    firstName: String,
-    lastName: String,
-    address: String,
-    city: String,
-    state: String,
-    country: String,
-    postalCode: String
-  },
-  billingAddress: {
-    address: String,
-    city: String,
-    state: String,
-    country: String,
-    postalCode: String
-  },
-  payPalDetails: {
-    email: String,
-    orderId: String,
-    paymentStatus: String
-  },
+  personalDetail: { type: mongoose.Schema.Types.ObjectId, ref: 'PersonalDetail' },
+  billingAddress: { type: mongoose.Schema.Types.ObjectId, ref: 'BillingAddress' },
+  payPalDetails: { type: mongoose.Schema.Types.ObjectId, ref: 'PayPal' },
   createdAt: { type: Date, default: Date.now }
 });
 
