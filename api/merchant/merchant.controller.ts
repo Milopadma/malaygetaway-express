@@ -10,7 +10,7 @@ import {
 import { Response } from "express";
 import businessModel from "../../model/business/business.model";
 import {
-sendInternalError,
+  sendInternalError,
   sendSuccess,
   sendNotFound,
   sendConflict,
@@ -23,6 +23,7 @@ import {
   validatePhoneNumber,
 } from "~/helpers/utils";
 import userModel from "~/model/users/user.model";
+import productModel from "~/model/product/product.model";
 
 /**
  * Controller class for handling merchant operations.
@@ -305,6 +306,25 @@ export class MerchantController {
         return;
       }
 
+      // Check if required fields are present
+      const requiredFields = [
+        "productId",
+        "name",
+        "description",
+        "price",
+        "type",
+        "productImageURLs",
+        "merchantId",
+      ];
+      for (let field of requiredFields) {
+        if (!product[field]) {
+          res
+            .status(400)
+            .json({ success: false, message: `Product ${field} is required` });
+          return;
+        }
+      }
+
       console.log("product:", product);
       console.log("product.merchantid:", product.merchantId);
 
@@ -321,6 +341,11 @@ export class MerchantController {
         merchantData.products.push(product);
         await merchant.save();
         console.log("merchantData.products:", merchantData.products);
+
+        // Save product data in ProductModel
+        const newProduct = new productModel(product);
+        await newProduct.save();
+
         sendSuccess(res, { data: merchantData.products });
       }
     } catch (error) {

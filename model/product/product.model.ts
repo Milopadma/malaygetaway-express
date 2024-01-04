@@ -1,14 +1,5 @@
 import { model, Schema } from "mongoose";
-
-interface Product {
-  productId: number;
-  name: string;
-  description: string;
-  price: number;
-  type: string;
-  productImageURLs: string[];
-  merchantId: number;
-}
+import { Product } from "~/types";
 
 const productSchema = new Schema<Product>({
   productId: { type: Number, required: true, unique: true },
