@@ -23,9 +23,26 @@ const userSchema = new Schema<
     data: {
       // if its a merchant type
       merchantId: { type: Number, required: true, unique: true },
-      phoneNumber: { type: Number, required: true },
-      email: { type: String, required: true },
+      name: { type: String, required: true },
+      contactNumber: { type: Number, required: true },
+      contactEmail: { type: String, required: true },
+      description: { type: String, required: true },
+      businessFileURLs: { type: [String], required: true },
       status: { type: String, required: true },
+      products: {
+        type: [
+          {
+            productId: { type: Number, required: true },
+            name: { type: String, required: true },
+            description: { type: String, required: true },
+            price: { type: Number, required: true },
+            type: { type: String, required: true },
+            productImageURLs: { type: [String], required: true },
+            merchantId: { type: Number, required: true },
+          },
+        ],
+        required: true,
+      },
     } || {
         // if its a customer type
         customerId: { type: Number, required: true, unique: true },
@@ -35,48 +52,6 @@ const userSchema = new Schema<
       },
   },
 });
-
-// const userSchema = new Schema<User<{ type: UserType.MERCHANT; data: MerchantData }>>({
-//     userId: { type: Number, required: true, unique: true },
-//     username: { type: String, required: true, unique: true },
-//     password: { type: String, required: true },
-//     data: {
-//         type: { type: String, required: true },
-//         data: {
-//             // if its a merchant type
-//             merchantId: { type: Number, required: true, unique: true },
-//             phoneNumber: { type: Number, required: true },
-//             email: { type: String, required: true },
-//             status: { type: String, required: true },
-//         },
-//     },
-// });
-
-// const userSchema2 = new Schema<User<{ type: UserType.CUSTOMER; data: CustomerData }>>({
-//     userId: { type: Number, required: true, unique: true },
-//     username: { type: String, required: true, unique: true },
-//     password: { type: String, required: true },
-//     data: {
-//         type: { type: String, required: true },
-//         data: {
-//             // if its a customer type
-//             customerId: { type: Number, required: true, unique: true },
-//         },
-//     },
-// });
-
-// const userSchema3 = new Schema<User<{ type: UserType.MINISTRY_OFFICER; data: CustomerData }>>({
-//     userId: { type: Number, required: true, unique: true },
-//     username: { type: String, required: true, unique: true },
-//     password: { type: String, required: true },
-//     data: {
-//         type: { type: String, required: true },
-//         data: {
-//             // if its a ministry officer type
-//             officerId: { type: Number, required: true, unique: true },
-//         },
-//     },
-// });
 
 const userModel = model<
   User<

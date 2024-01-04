@@ -12,7 +12,6 @@ import AuthRouter from "./api/auth/auth.routes";
 // Adit
 import PersonalDetailRouter from "./api/purchase/personalDetail/personalDetail.routes";
 import BillingAddressRouter from "./api/purchase/billingAddress/billingAddress.routes";
-import FilesRouter from "./api/files/files.routes";
 import PayPalRouter from "./api/purchase/paymentMethod/payPal/payPal.routes";
 import FormReviewRouter from "./api/review/formReview.routes";
 import ReceiptRouter from "./api/receipt/receipt.routes";
@@ -20,10 +19,22 @@ import { PersonalDetailController } from './api/purchase/personalDetail/personal
 import { BillingAddressController } from './api/purchase/billingAddress/billingAddress.controller';
 import { PayPalController } from './api/purchase/paymentMethod/payPal/payPal.controller';
 import { ReceiptController } from './api/receipt/receipt.controller';
+import { checkKeys, sendFiles } from "./helpers/utils";
+import formidable from "formidable";
+import path from "path";
+import { FilesController } from "./api/files/files.controller";
 
 const app = express();
 dotenv.config();
-
+app.use(express.json());
+app.use(cors());
+export const utapi = new UTApi({
+  apiKey: process.env.UPLOADTHING_SECRET,
+});
+// key checks
+checkKeys();
+// mongodb connection
+checkConnection();
 // Get all detail of purchase and send to receipt
 const personalDetailController = new PersonalDetailController();
 const billingAddressController = new BillingAddressController();
@@ -68,31 +79,10 @@ const corsOption = {
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS", // Include 'OPTIONS'
   credentials: true,
 };
-app.use(cors(corsOption));
+app.use(express.urlencoded({ extended: false }));
 
 // Enable pre-flight across the board
 app.options("*", cors(corsOption));
-
-app.use(express.json());
-
-if (!process.env.JWT_SECRET_KEY) {
-  console.error("JWT secret not found!");
-  process.exit(1);
-}
-if (!process.env.RESEND_API_KEY) {
-  console.error("RESEND Secret key not found!");
-  process.exit(1);
-}
-
-// this was causing crashes
-// app.use(
-//   session({
-//     secret: String(process.env.SESSION_SECRET),
-//     resave: false,
-//     saveUninitialized: true,
-//     cookie: { secure: false }, // Set secure to true for HTTPS
-//   })
-// );
 
 // Logging Middleware for Debugging
 app.use(express.json());
@@ -104,44 +94,56 @@ app.use((req, res, next) => {
   console.log(`Method  : ${req.method}`);
   console.log(`URL     : ${req.url}`);
 
-  if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
+  if (["POST", "PUT", "PATCH"].includes(req.method)) {
     console.log(`Body    : ${JSON.stringify(req.body, null, 2)}`);
   }
+  console.log(`Body    : ${JSON.stringify(req.body)}`);
   console.log("---- LOG END ----\n");
   next();
 });
 
-app.use(express.urlencoded({ extended: false }));
-
-// mongodb connection
-checkConnection();
-
-// external provider for file hosting
-if (!process.env.UPLOADTHING_SECRET) {
-  console.error("Uploadthing secret not found");
-  process.exit(1);
-}
-export const utapi = new UTApi({
-  apiKey: process.env.UPLOADTHING_SECRET,
-});
-if (utapi) {
-  console.log("📁 UTApi Connected ✅");
-} else {
-  console.error("UTApi connection error");
-}
-
-// app.get("/", (req: any, res: { redirect: (arg0: string) => void }) => {
-//   res.redirect("http://localhost:3003");
-// });
-
-app.get("/", (req, res) => {
+app.get("/api/hello", (req, res) => {
   res.send("Hello World!");
 });
 
 // Mylo's Endpoints
 app.use("/api/auth", AuthRouter);
 app.use("/api/merchant", MerchantRouter);
-app.use("/api/files", FilesRouter);
+// ---------------------------------------------------------------
+const fc = new FilesController();
+
+declare global {
+  namespace Express {
+    interface Request {
+      filePaths?: string[];
+    }
+  }
+}
+
+app.post(
+  "/api/files/upload",
+  (req, res, next) => {
+    const form = formidable({
+      uploadDir: path.join(import.meta.dir, "uploads"),
+      keepExtensions: true,
+    });
+
+    const filePaths: string[] = []; // Create an array to store file paths
+
+    form.on("file", function (field, file) {
+      // Push each file path into the array
+      filePaths.push(file.filepath);
+    });
+
+    form.on("end", function () {
+      req.filePaths = filePaths; // Attach the file paths to the req object
+      next(); // call next() to move to the next middleware function
+    });
+
+    form.parse(req);
+  },
+  fc.sendFiles
+);
 
 // Adit's Endpoints
 app.use("/api/purchase/personalDetail", PersonalDetailRouter);

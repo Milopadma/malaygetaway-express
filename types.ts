@@ -6,6 +6,13 @@ export enum UserType {
   MINISTRY_OFFICER = "ministry_officer",
 }
 
+export interface MerchantDataResponse {
+  status: string;
+  code: number;
+  data: MerchantData[];
+  message: string;
+}
+
 // login types
 export interface User<UserTypeData> {
   userId: number;
@@ -29,9 +36,23 @@ export enum MerchantStatus {
 
 export interface MerchantData {
   merchantId: number;
-  phoneNumber: number;
-  email: string;
+  name: string;
+  contactNumber: number;
+  contactEmail: string;
+  description: string;
+  businessFileURLs: string[];
   status: MerchantStatus;
+  products: Product[];
+}
+
+export interface Product {
+  productId: number;
+  name: string;
+  description: string;
+  price: number;
+  type: string;
+  productImageURLs: string[];
+  merchantId: number;
 }
 
 // Customer related interface types
