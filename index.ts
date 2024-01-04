@@ -15,14 +15,15 @@ import BillingAddressRouter from "./api/purchase/billingAddress/billingAddress.r
 import PayPalRouter from "./api/purchase/paymentMethod/payPal/payPal.routes";
 import FormReviewRouter from "./api/review/formReview.routes";
 import ReceiptRouter from "./api/receipt/receipt.routes";
-import { PersonalDetailController } from './api/purchase/personalDetail/personalDetail.controller';
-import { BillingAddressController } from './api/purchase/billingAddress/billingAddress.controller';
-import { PayPalController } from './api/purchase/paymentMethod/payPal/payPal.controller';
-import { ReceiptController } from './api/receipt/receipt.controller';
+import { PersonalDetailController } from "./api/purchase/personalDetail/personalDetail.controller";
+import { BillingAddressController } from "./api/purchase/billingAddress/billingAddress.controller";
+import { PayPalController } from "./api/purchase/paymentMethod/payPal/payPal.controller";
+import { ReceiptController } from "./api/receipt/receipt.controller";
 import { checkKeys, sendFiles } from "./helpers/utils";
 import formidable from "formidable";
 import path from "path";
 import { FilesController } from "./api/files/files.controller";
+import CustomerRouter from "./api/customer/customer.routes";
 
 const app = express();
 dotenv.config();
@@ -40,17 +41,26 @@ const personalDetailController = new PersonalDetailController();
 const billingAddressController = new BillingAddressController();
 const payPalController = new PayPalController();
 
-app.get('/api/receipt/get/:id', async (req, res) => {
+app.get("/api/receipt/get/:id", async (req, res) => {
   try {
     const userId = req.params.id;
-    const personalDetail = await personalDetailController.getPersonalDetailById({ params: { id: userId } }, res);
-    const billingAddress = await billingAddressController.getBillingAddressById({ params: { id: userId } }, res);
-    const payPal = await payPalController.getPayPalById({ params: { id: userId } }, res);
+    const personalDetail = await personalDetailController.getPersonalDetailById(
+      { params: { id: userId } },
+      res
+    );
+    const billingAddress = await billingAddressController.getBillingAddressById(
+      { params: { id: userId } },
+      res
+    );
+    const payPal = await payPalController.getPayPalById(
+      { params: { id: userId } },
+      res
+    );
 
     const receiptData = {
       personalDetail,
       billingAddress,
-      payPal
+      payPal,
     };
 
     res.json(receiptData);
@@ -58,11 +68,10 @@ app.get('/api/receipt/get/:id', async (req, res) => {
     if (error instanceof Error) {
       res.status(500).send(error.message);
     } else {
-      res.status(500).send('Unknown error occurred');
+      res.status(500).send("Unknown error occurred");
     }
   }
 });
-
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -151,6 +160,9 @@ app.use("/api/purchase/billingAddress", BillingAddressRouter);
 app.use("/api/purchase/paymentMethod/payPal", PayPalRouter);
 app.use("/api/review/formReview", FormReviewRouter);
 app.use("/api/receipt/receipt", ReceiptRouter);
+
+// customer view endpoints
+app.use("/api/customer", CustomerRouter);
 
 // Test Server Running
 const port = process.env.PORT || 8080;
