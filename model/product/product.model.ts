@@ -3,6 +3,7 @@ import { Product } from "~/types";
 
 const productSchema = new Schema<Product>({
   productId: { type: Number, required: true, unique: true },
+  address: { type: String, required: true },
   name: { type: String, required: true },
   description: { type: String, required: true },
   price: { type: Number, required: true },

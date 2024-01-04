@@ -273,6 +273,7 @@ export class MerchantController {
   async getSingleProduct(req: { params: { productId: number } }, res: any) {
     try {
       const productId = Number(req.params.productId);
+      console.log("productId:", productId);
       const merchant = await userModel.findOne({
         "data.type": "merchant",
         "data.data.products.productId": productId,
@@ -310,6 +311,7 @@ export class MerchantController {
       const requiredFields = [
         "productId",
         "name",
+        "address",
         "description",
         "price",
         "type",
@@ -384,6 +386,7 @@ export class MerchantController {
         } else {
           productToUpdate.name = product.name;
           productToUpdate.description = product.description;
+          productToUpdate.address = product.address;
           productToUpdate.price = product.price;
           productToUpdate.productImageURLs = product.productImageURLs;
           productToUpdate.type = product.type;
