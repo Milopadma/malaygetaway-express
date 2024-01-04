@@ -10,7 +10,7 @@ import {
 import { Response } from "express";
 import businessModel from "../../model/business/business.model";
 import {
-  sendInternalError,
+sendInternalError,
   sendSuccess,
   sendNotFound,
   sendConflict,
