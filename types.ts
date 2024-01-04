@@ -46,7 +46,9 @@ export interface MerchantData {
 }
 
 export interface Product {
+  [key: string]: any;
   productId: number;
+  address: string;
   name: string;
   description: string;
   price: number;

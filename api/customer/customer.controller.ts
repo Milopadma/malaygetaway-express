@@ -19,18 +19,18 @@ export class CustomerController {
     sendSuccess(res, response);
   }
 
-  async getProduct(req: Request, res: Response) {
-    const product = await productModel.findById(Number(req.params.productId));
-    if (!product) {
-      sendNotFound(res, "Product not found");
-      return;
-    }
-    const response = {
-      status: "success",
-      data: product,
-      code: 200,
-      message: "Product retrieved successfully",
-    };
-    sendSuccess(res, response);
-  }
+//   async getProduct(req: Request, res: Response) {
+//     const product = await productModel.findById(Number(req.params.productId));
+//     if (!product) {
+//       sendNotFound(res, "Product not found");
+//       return;
+//     }
+//     const response = {
+//       status: "success",
+//       data: product,
+//       code: 200,
+//       message: "Product retrieved successfully",
+//     };
+//     sendSuccess(res, response);
+//   }
 }
