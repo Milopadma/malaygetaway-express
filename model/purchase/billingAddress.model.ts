@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 const billingAddressSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   address: { type: String, required: true },
   city: { type: String, required: true },
   state: { type: String, default: "DUMAI", required: true },
@@ -8,4 +9,4 @@ const billingAddressSchema = new mongoose.Schema({
   postalCode: { type: String, required: true },
 });
 
-export default mongoose.model("billingAddress", billingAddressSchema);
+export default mongoose.model("BillingAddress", billingAddressSchema);

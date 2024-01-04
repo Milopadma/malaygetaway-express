@@ -14,6 +14,11 @@ import PersonalDetailRouter from "./api/purchase/personalDetail/personalDetail.r
 import BillingAddressRouter from "./api/purchase/billingAddress/billingAddress.routes";
 import PayPalRouter from "./api/purchase/paymentMethod/payPal/payPal.routes";
 import FormReviewRouter from "./api/review/formReview.routes";
+import ReceiptRouter from "./api/receipt/receipt.routes";
+import { PersonalDetailController } from './api/purchase/personalDetail/personalDetail.controller';
+import { BillingAddressController } from './api/purchase/billingAddress/billingAddress.controller';
+import { PayPalController } from './api/purchase/paymentMethod/payPal/payPal.controller';
+import { ReceiptController } from './api/receipt/receipt.controller';
 import { checkKeys, sendFiles } from "./helpers/utils";
 import formidable from "formidable";
 import path from "path";
@@ -30,17 +35,42 @@ export const utapi = new UTApi({
 checkKeys();
 // mongodb connection
 checkConnection();
+// Get all detail of purchase and send to receipt
+const personalDetailController = new PersonalDetailController();
+const billingAddressController = new BillingAddressController();
+const payPalController = new PayPalController();
 
-app.use(function (
-  req: any,
-  res: { header: (arg0: string, arg1: string) => void },
-  next: () => void
-) {
+app.get('/api/receipt/get/:id', async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const personalDetail = await personalDetailController.getPersonalDetailById({ params: { id: userId } }, res);
+    const billingAddress = await billingAddressController.getBillingAddressById({ params: { id: userId } }, res);
+    const payPal = await payPalController.getPayPalById({ params: { id: userId } }, res);
+
+    const receiptData = {
+      personalDetail,
+      billingAddress,
+      payPal
+    };
+
+    res.json(receiptData);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).send(error.message);
+    } else {
+      res.status(500).send('Unknown error occurred');
+    }
+  }
+});
+
+
+app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
     "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
   );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   next();
 });
 
@@ -64,7 +94,6 @@ app.use((req, res, next) => {
   console.log(`Method  : ${req.method}`);
   console.log(`URL     : ${req.url}`);
 
-  // Cetak isi body request untuk metode POST, PUT, dan PATCH
   if (["POST", "PUT", "PATCH"].includes(req.method)) {
     console.log(`Body    : ${JSON.stringify(req.body, null, 2)}`);
   }
@@ -77,7 +106,7 @@ app.get("/api/hello", (req, res) => {
   res.send("Hello World!");
 });
 
-// Mylo's endpoints
+// Mylo's Endpoints
 app.use("/api/auth", AuthRouter);
 app.use("/api/merchant", MerchantRouter);
 // ---------------------------------------------------------------
@@ -116,11 +145,12 @@ app.post(
   fc.sendFiles
 );
 
-// Adit
+// Adit's Endpoints
 app.use("/api/purchase/personalDetail", PersonalDetailRouter);
 app.use("/api/purchase/billingAddress", BillingAddressRouter);
 app.use("/api/purchase/paymentMethod/payPal", PayPalRouter);
 app.use("/api/review/formReview", FormReviewRouter);
+app.use("/api/receipt/receipt", ReceiptRouter);
 
 // Test Server Running
 const port = process.env.PORT || 8080;

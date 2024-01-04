@@ -25,11 +25,6 @@ export class FormReviewController {
   }, res: any) {
     try {
       const {
-        orderRating,
-        serviceRating,
-        priceRating,
-        placeRating,
-        overallRating,
         name,
         email,
         product,
@@ -37,11 +32,6 @@ export class FormReviewController {
       } = req.body;
 
       const formReview = await FormReview.create({
-        orderRating,
-        serviceRating,
-        priceRating,
-        placeRating,
-        overallRating,
         name,
         email,
         product,
@@ -81,11 +71,6 @@ export class FormReviewController {
   async updateFormReview(req: {
     params: { id: any };
     body: {
-      orderRating: number;
-      serviceRating: number;
-      priceRating: number;
-      placeRating: number;
-      overallRating: number;
       name: string;
       email: string;
       product: string;
